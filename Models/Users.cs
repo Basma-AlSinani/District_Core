@@ -1,7 +1,10 @@
-﻿namespace District_Core.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace District_Core.Models
 {
     public class Users
     {
+        [Key]
         public int UserId { get; set; }
         public string Username { get; set; }
         public string Email { get; set; }
