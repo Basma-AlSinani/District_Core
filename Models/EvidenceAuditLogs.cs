@@ -1,10 +1,26 @@
-﻿namespace District_Core.Models
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace District_Core.Models
 {
+    public enum EvidenceAction
+    {
+        Add,
+        Updated,
+        SoftDeleted,
+        HardDeleted,
+    }
     public class EvidenceAuditLogs
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int EvidenceAuditLogId { get; set; }
         public string Action { get; set; }
         public DateTime ActedAt { get; set; }
         public string Details { get; set; }
+
+        [ForeignKey("Evidence")]
+        public int EvidenceItemId { get; set; }
+        public Evidence Evidence { get; set; }
     }
 }
