@@ -8,12 +8,20 @@ namespace Crime.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int CaseReportId { get; set; }
-        public DateTime LinkedAt { get; set; }
+
+        public DateTime LinkedAt { get; set; } = DateTime.UtcNow;
+
         [ForeignKey("Cases")]
         public int CaseId { get; set; }
-        public Cases Cases { get; set; }
+        public Cases cases { get; set; }
+
         [ForeignKey("CrimeReports")]
         public int CrimeReportId { get; set; }
         public CrimeReports CrimeReports { get; set; }
+
+        [ForeignKey("Users")]
+        public int? PerformedBy { get; set; } //to regester who performed the action (linking)
+        public Users? Users { get; set; } // navigation property to Users
+
     }
 }

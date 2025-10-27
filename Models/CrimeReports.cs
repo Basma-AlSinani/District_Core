@@ -5,10 +5,12 @@ namespace Crime.Models
 {
     public enum CrimeStatus
     {
-        Reported,
-        UnderInvestigation,
-        Resolved,
-        Closed
+        pending,
+        en_route,
+        on_scene,
+        under_investigation,
+        resolved,
+        reported
     }
     public class CrimeReports
     {
@@ -17,12 +19,14 @@ namespace Crime.Models
         public int CrimeReportId { get; set; }
         [Required]
         public string Title { get; set; }
-        [Required]
+        [Required, MaxLength(100)]
         public string Description { get; set; }
         [Required]
         public string AreaCity { get; set; }
         public DateTime ReportDataTime { get; set; }
-        public string CrimeStatus { get; set; }
+        [Required]
+        public CrimeStatus CrimeStatus { get; set; }
+
         public decimal Latitude { get; set; }
         public decimal Longitude { get; set; }
         [ForeignKey("Users")]

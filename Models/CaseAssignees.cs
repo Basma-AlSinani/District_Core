@@ -9,7 +9,7 @@ namespace Crime.Models
         Officer
     }
 
-    public enum ProgressStatus
+    public enum ProgreessStatus
     {
         Pending,
         InProgress,
@@ -21,9 +21,13 @@ namespace Crime.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int CaseAssigneeId { get; set; }
-        public string AssigneeRole { get; set; }
-        public string ProgreessStatus { get; set; }
-        public DateTime AssignedAt { get; set; }
+
+        [Required]
+        public AssigneeRole AssigneeRole { get; set; }
+
+        [Required]
+        public ProgreessStatus ProgreessStatus { get; set; }
+        public DateTime AssignedAt { get; set; }= DateTime.UtcNow;
 
         [ForeignKey("Cases")]
         public int CaseId { get; set; }
