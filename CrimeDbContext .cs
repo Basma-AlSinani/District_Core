@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Crime
 {
-    //ii
+    
     public class CrimeDbContext : DbContext
     {
         public CrimeDbContext(DbContextOptions<CrimeDbContext> options) : base(options) { }
