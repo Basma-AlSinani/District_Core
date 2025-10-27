@@ -1,0 +1,6 @@
+@District_Core_HostAddress = http://localhost:5076
+
+GET {{District_Core_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
