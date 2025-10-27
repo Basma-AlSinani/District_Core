@@ -1,7 +1,10 @@
-﻿namespace District_Core.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace District_Core.Models
 {
     public class CaseParticipants
     {
+        [Key]
         public int CaseParticipantId { get; set; }
 
         public int CaseId { get; set; } //FK to Cases
