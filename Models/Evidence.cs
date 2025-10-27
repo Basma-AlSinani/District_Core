@@ -1,4 +1,4 @@
-﻿namespace District_Core.Models
+﻿namespace Crime.Models
 {
     public class Evidence
     {

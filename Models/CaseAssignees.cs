@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace District_Core.Models
+namespace Crime.Models
 {
     public enum AssigneeRole
     {
