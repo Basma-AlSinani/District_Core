@@ -42,6 +42,8 @@ namespace Crime.Models
         [MaxLength(50)]
         public string LastName { get; set; }
 
+        public string FullName { get; set; }
+
         [Required, EmailAddress]
         public string Email { get; set; }
 
@@ -52,7 +54,7 @@ namespace Crime.Models
         public Role Role { get; set; }
 
         [Required]
-        public string ClearanceLevel { get; set; }
+        public ClearanceLevel ClearanceLevel { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }
