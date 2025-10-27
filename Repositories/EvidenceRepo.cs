@@ -7,6 +7,7 @@ namespace Crime.Repositories
         private readonly CrimeDbContext _context;
         public EvidenceRepo(CrimeDbContext context) : base(context)
         {
+            _context = context;
         }
 
         //soft delete evidence  

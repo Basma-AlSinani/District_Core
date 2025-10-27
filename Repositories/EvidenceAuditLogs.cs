@@ -8,7 +8,7 @@ namespace Crime.Repositories
         private readonly CrimeDbContext _context;
         public EvidenceAuditLogs(CrimeDbContext context) : base(context)
         {
-
+            _context = context;
         }
 
         public async Task<IEnumerable<EvidenceAuditLogs>> GetLogsByEvidenceIdAsync(int evidenceId)
