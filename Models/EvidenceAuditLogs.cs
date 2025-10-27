@@ -15,8 +15,11 @@ namespace Crime.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int EvidenceAuditLogId { get; set; }
+
+        [Required, MaxLength(50)]
         public string Action { get; set; }
         public DateTime ActedAt { get; set; }
+        [MaxLength(1000)]
         public string Details { get; set; }
 
         [ForeignKey("Evidence")]

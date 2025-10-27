@@ -21,7 +21,11 @@ namespace Crime.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int CaseAssigneeId { get; set; }
+
+        [Required]
         public string AssigneeRole { get; set; }
+
+        [Required]
         public string ProgreessStatus { get; set; }
         public DateTime AssignedAt { get; set; }
 

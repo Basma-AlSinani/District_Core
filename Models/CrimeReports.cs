@@ -17,12 +17,14 @@ namespace Crime.Models
         public int CrimeReportId { get; set; }
         [Required]
         public string Title { get; set; }
-        [Required]
+        [Required, MaxLength(100)]
         public string Description { get; set; }
         [Required]
         public string AreaCity { get; set; }
         public DateTime ReportDataTime { get; set; }
+        [Required]
         public string CrimeStatus { get; set; }
+
         public decimal Latitude { get; set; }
         public decimal Longitude { get; set; }
         [ForeignKey("Users")]
