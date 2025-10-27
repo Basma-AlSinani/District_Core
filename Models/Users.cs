@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Crime.Models
 {
-    public enum Role
+    public enum UserRole
     {
         Admin,
         Investigator,
