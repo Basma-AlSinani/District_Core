@@ -4,10 +4,10 @@ using System.Data;
 
 namespace Crime.Repositories
 {
-    public class CrimeReportsRepository : GenericRepository<CrimeReports>, ICrimeReportsRepository
+    public class CrimeReportsRepo : GenericRepository<CrimeReports>, ICrimeReportsRepository
     {
         private readonly CrimeDbContext _context;
-        public CrimeReportsRepository(CrimeDbContext context) : base(context)
+        public CrimeReportsRepo(CrimeDbContext context) : base(context)
         {
             _context = context;
         }
