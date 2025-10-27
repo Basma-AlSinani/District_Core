@@ -28,7 +28,7 @@ namespace Crime.Models
         public Role Role { get; set; }
 
         [ForeignKey(nameof(Users))]
-        public string? AddedByUserId { get; set; } //FK to Users
+        public int? AddedByUserId { get; set; } //FK to Users
         public Users AddedByUser { get; set; }
 
         public DateTime AssignedAt { get; set; } = DateTime.Now;
