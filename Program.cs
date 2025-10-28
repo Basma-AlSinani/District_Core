@@ -23,6 +23,8 @@ namespace Crime
             // register repositories and services
             builder.Services.AddScoped<IEvidenceRepo, EvidenceRepo>();
             builder.Services.AddScoped<IEvidenceService, EvidenceService>();
+            builder.Services.AddScoped<IEvidenceAuditLogsRepo, EvidenceAuditLogsRepo>();
+            builder.Services.AddScoped<IEvidenceAuditLogsService, EvidenceAuditLogsService>();
             var app = builder.Build();
 
             if (app.Environment.IsDevelopment())
