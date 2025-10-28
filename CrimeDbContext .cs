@@ -59,6 +59,10 @@ namespace Crime
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<CaseReports>()
+                .HasIndex(cr => new { cr.CaseId, cr.CrimeReportId })
+                .IsUnique();
+
+            modelBuilder.Entity<CaseReports>()
                 .HasOne(cr => cr.cases)
                 .WithMany()
                 .HasForeignKey(cr => cr.CaseId)
