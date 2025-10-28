@@ -2,7 +2,7 @@
 
 namespace Crime.Repositories
 {
-    public interface IEvidenceRepo 
+    public interface IEvidenceRepo : IGenericRepository<Evidence>
     {
         Task<byte[]> GetEvidenceImageAsync(int id);
         Task HardDeletAsync(Evidence evidence);

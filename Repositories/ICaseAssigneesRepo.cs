@@ -2,7 +2,7 @@
 
 namespace Crime.Repositories
 {
-    public interface ICaseAssigneesRepo
+    public interface ICaseAssigneesRepo : IGenericRepository<CaseAssignees>
     {
         Task<bool> AssignUserToCaseAsync(int caseId, int userId, AssigneeRole role);
         Task<IEnumerable<CaseAssignees>> GetAssigneesByCaseIdAsync(int caseId);

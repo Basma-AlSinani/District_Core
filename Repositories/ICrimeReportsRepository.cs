@@ -2,7 +2,7 @@
 
 namespace Crime.Repositories
 {
-    public interface ICrimeReportsRepository
+    public interface ICrimeReportsRepository : IGenericRepository<CrimeReports>
     {
         Task<IEnumerable<CrimeReports>> GetReportsByUserIdAsync(int userId);
         Task<IEnumerable<CrimeReports>> SearchAsync(string keyword);
