@@ -51,7 +51,7 @@ namespace Crime.Models
         public string PasswordHash { get; set; }
 
         [Required]
-        public Role Role { get; set; }
+        public UserRole Role { get; set; }
 
         [Required]
         public ClearanceLevel ClearanceLevel { get; set; }
