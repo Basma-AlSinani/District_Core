@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Crime.Repositories
 {
-    public class EvidenceAuditLogs : GenericRepository<EvidenceAuditLogs>, IEvidenceAuditLogs
+    public class EvidenceAuditLogsRepo : GenericRepository<EvidenceAuditLogs>, IEvidenceAuditLogsRepo
     {
         private readonly CrimeDbContext _context;
-        public EvidenceAuditLogs(CrimeDbContext context) : base(context)
+        public EvidenceAuditLogsRepo(CrimeDbContext context) : base(context)
         {
             _context = context;
         }

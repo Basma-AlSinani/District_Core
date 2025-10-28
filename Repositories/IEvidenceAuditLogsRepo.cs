@@ -1,7 +1,8 @@
-﻿
+﻿using Crime.Models;
+
 namespace Crime.Repositories
 {
-    public interface IEvidenceAuditLogs : IGenericRepository<EvidenceAuditLogs>
+    public interface IEvidenceAuditLogsRepo : IGenericRepository<EvidenceAuditLogs>
     {
         Task<IEnumerable<EvidenceAuditLogs>> GetLogsByEvidenceIdAsync(int evidenceId);
     }
