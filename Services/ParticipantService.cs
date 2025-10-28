@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Crime.Services
 {
-    public class ParticipantService
+    public class ParticipantService : IParticipantService
     {
         private readonly IParticipantsRepo _participantRepository;
         public ParticipantService(IParticipantsRepo participantRepository)

@@ -110,11 +110,12 @@ namespace Crime.Migrations
 
                     b.HasKey("CaseReportId");
 
-                    b.HasIndex("CaseId");
-
                     b.HasIndex("CrimeReportId");
 
                     b.HasIndex("PerformedBy");
+
+                    b.HasIndex("CaseId", "CrimeReportId")
+                        .IsUnique();
 
                     b.ToTable("CaseReports");
                 });

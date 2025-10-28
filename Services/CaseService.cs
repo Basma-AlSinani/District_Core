@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Crime.Services
 {
-    public class CaseService
+    public class CaseService : ICaseService
     {
         private readonly ICasesRepo _caseRepository;
 

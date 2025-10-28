@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Crime.Services
 {
-    public class UsersService
+    public class UsersService : IUsersService
     {
         private readonly IUsersRepo _userRepository;
 
