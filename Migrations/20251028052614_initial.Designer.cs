@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Crime.Migrations
 {
     [DbContext(typeof(CrimeDbContext))]
-    [Migration("20251027081334_initial")]
+    [Migration("20251028052614_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -113,11 +113,12 @@ namespace Crime.Migrations
 
                     b.HasKey("CaseReportId");
 
-                    b.HasIndex("CaseId");
-
                     b.HasIndex("CrimeReportId");
 
                     b.HasIndex("PerformedBy");
+
+                    b.HasIndex("CaseId", "CrimeReportId")
+                        .IsUnique();
 
                     b.ToTable("CaseReports");
                 });

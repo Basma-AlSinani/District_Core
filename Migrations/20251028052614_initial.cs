@@ -290,9 +290,10 @@ namespace Crime.Migrations
                 column: "ParticipantId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CaseReports_CaseId",
+                name: "IX_CaseReports_CaseId_CrimeReportId",
                 table: "CaseReports",
-                column: "CaseId");
+                columns: new[] { "CaseId", "CrimeReportId" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_CaseReports_CrimeReportId",
