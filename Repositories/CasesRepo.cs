@@ -17,6 +17,15 @@ namespace Crime.Repositories
                 .Include(c => c.CreatedByUser)
                 .FirstOrDefaultAsync(c => c.CaseNumber == caseNumber);
         }
+
+        // Get all cases as a queryable
+        public IQueryable<Cases> GetAllQueryable()
+        {
+            return _context.Cases
+                .Include(c => c.CreatedByUser)
+                .AsQueryable();
+
+        }
     }
 }
 

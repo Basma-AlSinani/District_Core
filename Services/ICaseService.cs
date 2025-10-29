@@ -1,14 +1,13 @@
-﻿using Crime.Models;
+﻿using Crime.DTOs;
+using Crime.Models;
 
 namespace Crime.Services
 {
     public interface ICaseService
     {
-        Task<Cases> CreateAsync(Cases newCase);
-        Task DeleteAsync(int id);
-        Task<IEnumerable<Cases>> GetAllAsync();
-        Task<Cases> GetByIdAsync(int id);
-        Task<Cases> GetCaseByNumberAsync(string caseNumber);
-        Task UpdateAsync(Cases updatedCase);
+        Task<Cases> CreateCaseAsync(CaseCreateDTO dto);
+        Task<IEnumerable<CaseListDTO>> GetCasesAsync(string? search = null);
+        Task<CrimeReports> SubmitCrimeReportAsync(CrimeReportCreateDTO dto);
+        Task<Cases> UpdateCaseAsync(int caseId, UpdateCaseDTO dto);
     }
 }
