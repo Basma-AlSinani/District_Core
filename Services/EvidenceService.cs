@@ -1,5 +1,7 @@
 ﻿using Crime.Repositories;
 using Crime.Models;
+using Crime.DTOs;
+
 
 namespace Crime.Services
 {
@@ -56,5 +58,47 @@ namespace Crime.Services
         {
             await _evidenceRepo.UpdateContentAsync(id, textcontent, remarks);
         }
+
+        public async Task<Evidence> RecordEvidenceAsync(EvidenceDTOS.EvidenceCreateRequest request)
+        {
+            var evidence = new Evidence
+            {
+                CaseId = request.CaseId,
+                Type = request.Type,
+                Remarks = request.Remarks,
+                CreatedAt = DateTime.UtcNow,
+                AddedByUser = request.CreatedByUser,
+            };
+
+            if (request.Type == EvidenceType.Text)
+            {
+                evidence.TextContent = request.TextContent;
+            }
+            else
+                if (request.Type == EvidenceType.Image && request.File != null)
+            {
+                var uploadDictory = Path.Combine("wwroot", "evidences");
+                if (!Directory.Exists(uploadDictory))
+                {
+                    Directory.CreateDirectory(uploadDictory);
+                }
+
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(request.File.FileName);
+                var filePath = Path.Combine(uploadDictory, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await request.File.CopyToAsync(stream);
+                }
+
+                evidence.FileUrl = filePath;
+                evidence.MimeType = request.File.ContentType;
+                evidence.SizeBytes = request.File.Length;
+            }
+            await _evidenceRepo.AddAsync(evidence);
+            return evidence;
+        }
     }
 }
+
+

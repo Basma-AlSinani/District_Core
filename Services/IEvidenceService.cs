@@ -1,4 +1,5 @@
-﻿using Crime.Models;
+﻿using Crime.DTOs;
+using Crime.Models;
 
 namespace Crime.Services
 {
@@ -9,6 +10,7 @@ namespace Crime.Services
         Task<Evidence> GetByIdAsync(int id);
         Task<byte[]> GetEvidenceImageAsync(int id);
         Task HardDeleteAsync(int id);
+        Task<Evidence> RecordEvidenceAsync(EvidenceDTOS.EvidenceCreateRequest request);
         Task SoftDeleteAsync(int id);
         Task UpdateContentAsync(int id, string? textcontent, string? remarks);
     }
