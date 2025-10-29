@@ -26,6 +26,18 @@ namespace Crime.Repositories
                 .AsQueryable();
 
         }
+
+        // Get case details by ID with related data
+        public async Task<Cases> GetCaseDetailsByIdAsync(int id)
+        {
+            return await _context.Cases
+                .Include(c => c.CreatedByUser)
+                .Include(c => c.CaseReports)
+                .ThenInclude(cr => cr.CrimeReports)
+                .ThenInclude(cr => cr.Users)
+                .FirstOrDefaultAsync(c => c.CaseId == id);
+        }
+
     }
 }
 

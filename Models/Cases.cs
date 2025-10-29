@@ -48,5 +48,7 @@ namespace Crime.Models
         public Users CreatedByUser { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+        public ICollection<CaseReports> CaseReports { get; set; }
     }
 }

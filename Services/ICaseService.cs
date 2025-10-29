@@ -9,5 +9,6 @@ namespace Crime.Services
         Task<IEnumerable<CaseListDTO>> GetCasesAsync(string? search = null);
         Task<CrimeReports> SubmitCrimeReportAsync(CrimeReportCreateDTO dto);
         Task<Cases> UpdateCaseAsync(int caseId, UpdateCaseDTO dto);
+        Task<CaseDetailsDTO> GetCaseDetailsAsync(int caseId);
     }
 }

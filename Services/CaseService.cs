@@ -127,7 +127,7 @@ namespace Crime.Services
         {
             var query = _caseRepository.GetAllAsync().Result.AsQueryable()
                 .Include(c => c.CreatedByUser)
-                .AsQueryable();
+                .AsQueryable(); // Ensure we have IQueryable for filtering
 
             if (!string.IsNullOrEmpty(search))
             {
@@ -154,21 +154,40 @@ namespace Crime.Services
             return list;
         }
 
-        // Helper method to truncate description
-        private string TruncateDescription(string description, int maxLength = 100)
+        public async Task<CaseDetailsDTO> GetCaseDetailsAsync(int id)
         {
-            if (string.IsNullOrWhiteSpace(description) || description.Length <= maxLength)
-                return description;
+            var caseEntity = await _caseRepository.GetCaseDetailsByIdAsync(id);
+            if (caseEntity == null)
+                throw new Exception("Case not found");
+            
+            int assigneesCount = 0;
+            int evidencesCount = 0;
+            int suspectsCount = 0;
+            int victimsCount = 0;
+            int witnessesCount = 0;
 
-            var truncated = description.Substring(0, maxLength);
+            var firstReport = caseEntity.CaseReports?.FirstOrDefault()?.CrimeReports;
 
-            // Ensure we don't cut off in the middle of a word
-            int lastSpace = truncated.LastIndexOf(' ');
-            if (lastSpace > 0)
-                truncated = truncated.Substring(0, lastSpace);
-
-            return truncated + "...";
+            return new CaseDetailsDTO
+            {
+                CaseNumber = caseEntity.CaseNumber,
+                Name = caseEntity.Name,
+                Description = caseEntity.Description,
+                AreaCity = caseEntity.AreaCity,
+                CaseType = caseEntity.CaseType,
+                CaseLevel = "Level 1", // Placeholder for case level
+                AuthorizationLevel = caseEntity.AuthorizationLevel.ToString(),
+                CreatedBy = $"{caseEntity.CreatedByUser.FirstName} {caseEntity.CreatedByUser.LastName}",
+                CreatedAt = caseEntity.CreatedAt,
+                ReportedBy = firstReport != null ? $"{firstReport.Users.FirstName} {firstReport.Users.LastName}" : "N/A",
+                NumberOfAssignees = assigneesCount,
+                NumberOfEvidences = evidencesCount,
+                NumberOfSuspects = suspectsCount,
+                NumberOfVictims = victimsCount,
+                NumberOfWitnesses = witnessesCount
+            };
         }
+
     }
 }
 
