@@ -1,6 +1,7 @@
 ﻿using Crime.DTOs;
 using Crime.Models;
 using Crime.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace Crime.Services
 {
@@ -119,6 +120,54 @@ namespace Crime.Services
             await _crimeReportsRepo.SaveChangesAsync();
 
             return report;
+        }
+
+        // Get list of cases with optional search
+        public async Task<IEnumerable<CaseListDTO>> GetCasesAsync(string? search = null)
+        {
+            var query = _caseRepository.GetAllAsync().Result.AsQueryable()
+                .Include(c => c.CreatedByUser)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                search = search.ToLower();
+                query = query.Where(c =>
+                    c.Name.ToLower().Contains(search) ||
+                    c.Description.ToLower().Contains(search));
+            }
+
+            var list = await query
+                .Select(c => new CaseListDTO
+                {
+                    CaseNumber = c.CaseNumber,
+                    Name = c.Name,
+                    Description = c.Description,
+                    AreaCity = c.AreaCity,
+                    CaseType = c.CaseType,
+                    AuthorizationLevel = c.AuthorizationLevel,
+                    CreatedBy = $"{c.CreatedByUser.FirstName} {c.CreatedByUser.LastName}",
+                    CreatedAt = c.CreatedAt
+                })
+                .ToListAsync();
+
+            return list;
+        }
+
+        // Helper method to truncate description
+        private string TruncateDescription(string description, int maxLength = 100)
+        {
+            if (string.IsNullOrWhiteSpace(description) || description.Length <= maxLength)
+                return description;
+
+            var truncated = description.Substring(0, maxLength);
+
+            // Ensure we don't cut off in the middle of a word
+            int lastSpace = truncated.LastIndexOf(' ');
+            if (lastSpace > 0)
+                truncated = truncated.Substring(0, lastSpace);
+
+            return truncated + "...";
         }
     }
 }

@@ -55,5 +55,13 @@ namespace Crime.Controllers
                 CaseId = updatedCase.CaseId
             });
         }
+
+        // Get a list of cases with optional search
+        [HttpGet("list")]
+        public async Task<IActionResult> GetCases([FromQuery] string? search)
+        {
+            var cases = await _casesService.GetCasesAsync(search);
+            return Ok(cases);
+        }
     }
 }
