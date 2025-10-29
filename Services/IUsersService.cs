@@ -1,4 +1,5 @@
-﻿using Crime.Models;
+﻿using Crime.DTOs;
+using Crime.Models;
 
 namespace Crime.Services
 {
@@ -6,9 +7,6 @@ namespace Crime.Services
     {
         Task<Users> CreateAsync(Users user);
         Task DeleteAsync(int id);
-        Task<Users> GetByEmailAsync(string email);
-        Task<Users> GetByIdAsync(int id);
-        Task<Users> GetByUsernameAsync(string username);
-        Task UpdateAsync(Users user);
+        Task UpdateAsync(int id, UpdateUserDto dto);
     }
 }

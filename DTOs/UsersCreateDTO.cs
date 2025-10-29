@@ -6,27 +6,22 @@ namespace Crime.DTOs
     // DTO for creating a new user
     public class UsersCreateDTO
     {
-        [Required]
         public string FirstName { get; set; }
 
-        [Required]
         public string SecondName { get; set; }
 
-        public string ThirdName { get; set; }
+        public string? ThirdName { get; set; }
 
-        [Required]
         public string LastName { get; set; }
 
-        [Required]
+        public string Email { get; set; }
+
         public string Username { get; set; }
 
-        [Required]
-        public string PasswordHash { get; set; } 
+        public string Password { get; set; } 
 
-        [Required]
-        public Role Role { get; set; }
+        public UserRole Role { get; set; }
 
-        [Required]
         public ClearanceLevel ClearanceLevel { get; set; }
     }
 }
