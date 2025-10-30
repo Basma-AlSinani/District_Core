@@ -5,8 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Crime.Controllers
 {
-
-    [Route("api/[controller]")]
+    [Route("api/Cases")]
     [ApiController]
 
     public class CasesController : ControllerBase
@@ -18,7 +17,7 @@ namespace Crime.Controllers
             _caseService = casesService;
         }
 
-        [HttpPost("submit-report")]
+        [HttpPost("Submit/CrimeReport")]
         public async Task<IActionResult> SubmitCrimeReport([FromBody] CrimeReportCreateDTO dto)
         {
             var report = await _caseService.SubmitCrimeReportAsync(dto);
@@ -29,7 +28,7 @@ namespace Crime.Controllers
             });
         }
 
-        [HttpPost] 
+        [HttpPost("Create/New/Case")]
         public async Task<IActionResult> CreateCase([FromBody] CaseCreateDTO dto)
         {
             if (dto == null)
@@ -45,7 +44,7 @@ namespace Crime.Controllers
             });
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("update/By/ID/{id}")]
         public async Task<IActionResult> UpdateCase(int id, [FromBody] UpdateCaseDTO dto)
         {
             var updatedCase = await _caseService.UpdateCaseAsync(id, dto);
@@ -57,7 +56,7 @@ namespace Crime.Controllers
         }
 
         // Get a list of cases with optional search
-        [HttpGet("list")]
+        [HttpGet("Get/All/Cases")]
         public async Task<IActionResult> GetCases([FromQuery] string? search)
         {
             var cases = await _caseService.GetCasesAsync(search);
@@ -65,19 +64,13 @@ namespace Crime.Controllers
         }
 
         // Get case details by ID
-        [HttpGet("{id}")]
+        [HttpGet("Get/By/ID/{id}")]
         public async Task<IActionResult> GetCaseDetails(int id)
         {
-            try
             {
                 var caseDetails = await _caseService.GetCaseDetailsAsync(id);
                 return Ok(caseDetails);
             }
-            catch (Exception ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
         }
-
     }
 }

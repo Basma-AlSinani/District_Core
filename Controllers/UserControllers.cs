@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Crime.Controllers
 {
+    [Route("api/Users")]
     [ApiController]
-    [Route("api/[controller]")]
 
     public class UserControllers : ControllerBase
     {
@@ -17,7 +17,7 @@ namespace Crime.Controllers
         _userService = userService;
     }
 
-        [HttpPost]
+        [HttpPost("Create/New/User")]
         public async Task<IActionResult> CreateUser([FromBody] UsersCreateDTO dto)
         {
             // Map UsersCreateDTO to Users model
@@ -38,14 +38,14 @@ namespace Crime.Controllers
             return Ok(CreateUser);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("Update/By/ID/{id}")]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserDto dto)
         {
             await _userService.UpdateAsync(id, dto);
             return Ok(new { message = "User updated successfully." });
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("Delete/By/ID/{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
             await _userService.DeleteAsync(id);
