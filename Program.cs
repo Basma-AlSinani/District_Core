@@ -69,6 +69,8 @@ namespace Crime
             }
 
             app.UseHttpsRedirection();
+            app.UseMiddleware<Crime.Middleware.Authentication>();
+
             app.UseAuthorization();
             app.MapControllers();
             app.Run();
