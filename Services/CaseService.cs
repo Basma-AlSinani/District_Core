@@ -188,6 +188,47 @@ namespace Crime.Services
             };
         }
 
+        // Get assignees by case ID
+        public async Task<IEnumerable<object>> GetAssigneesByCaseIdAsync(int caseId)
+        {
+            var assignees = await _caseRepository.GetAssigneesByCaseIdAsync(caseId);
+            return assignees.Select(a => new
+            {
+                a.UserId,
+                FullName = $"{a.FirstName} {a.LastName}"
+            });
+        }
+
+        // Get evidence by case ID
+        public async Task<IEnumerable<object>> GetEvidenceByCaseIdAsync(int caseId)
+        {
+            var evidences = await _caseRepository.GetEvidenceByCaseIdAsync(caseId);
+            return evidences.Select(e => new
+            {
+                e.EvidenceId,
+                e.Type,
+                e.TextContent,
+                e.FileUrl,
+                e.MimeType,
+                e.SizeBytes,
+                e.Remarks,
+                e.CreatedAt
+            });
+        }
+
+        // Get participants by role
+        public async Task<IEnumerable<object>> GetParticipantsByRoleAsync(int caseId, Role role)
+        {
+            var participants = await _caseRepository.GetParticipantsByRoleAsync(caseId, role);
+            return participants.Select(p => new
+            {
+                p.ParticipantId,
+                FullName = p.Participant.FullName,
+                Role = p.Role.ToString(),
+                p.AssignedAt
+            });
+        }
     }
 }
+
 
