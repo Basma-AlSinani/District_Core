@@ -3,6 +3,8 @@ using Crime.Repositories;
 using Crime.Services;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using System.Security.AccessControl;
 using System.Security.Policy;
 
 
@@ -21,19 +23,39 @@ namespace Crime
             builder.Services.AddDbContext<CrimeDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
             // register repositories and services
+            builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
             builder.Services.AddScoped<IEvidenceRepo, EvidenceRepo>();
             builder.Services.AddScoped<IEvidenceService, EvidenceService>();
+
             builder.Services.AddScoped<ICasesRepo, CasesRepo>();
             builder.Services.AddScoped<ICaseService, CaseService>();
+
             builder.Services.AddScoped<IParticipantsRepo, ParticipantsRepo>();
             builder.Services.AddScoped<IParticipantService, ParticipantService>();
+
             builder.Services.AddScoped<IUsersRepo, UsersRepo>();
             builder.Services.AddScoped<IUsersService, UsersService>();
+
             builder.Services.AddScoped<ICaseParticipantsRepo, CaseParticipantsRepo>();
             builder.Services.AddScoped<ICaseParticipantService, CaseParticipantService>();
+            
+            builder.Services.AddScoped<IEvidenceAuditLogsRepo, EvidenceAuditLogsRepo>();
+            builder.Services.AddScoped<IEvidenceAuditLogsService, EvidenceAuditLogsService>();
+
+            builder.Services.AddScoped<ICrimeReportsRepository, CrimeReportsRepo>();
+            builder.Services.AddScoped<ICrimeReportsServies, CrimeReportsServies>();
 
             builder.Services.AddScoped<IEvidenceAuditLogsRepo, EvidenceAuditLogsRepo>();
             builder.Services.AddScoped<IEvidenceAuditLogsService, EvidenceAuditLogsService>();
+
+            builder.Services.AddScoped<ICaseReportRepo, CaseReportRepo>();
+            builder.Services.AddScoped<ICaseReportService, CaseReportService>();
+
+            builder.Services.AddScoped<ICaseAssigneesService, CaseAssigneesService>();
+            builder.Services.AddScoped<ICaseAssigneesRepo, CaseAssigneesRepo>();
+
+
             var app = builder.Build();
 
             if (app.Environment.IsDevelopment())
