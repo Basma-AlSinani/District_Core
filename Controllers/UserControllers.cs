@@ -17,7 +17,7 @@ namespace Crime.Controllers
         _userService = userService;
     }
 
-        [HttpPost("Create/New/User")]
+        [HttpPost("Create New User")]
         public async Task<IActionResult> CreateUser([FromBody] UsersCreateDTO dto)
         {
             // Map UsersCreateDTO to Users model
@@ -38,14 +38,14 @@ namespace Crime.Controllers
             return Ok(CreateUser);
         }
 
-        [HttpPut("Update/By/ID/{id}")]
+        [HttpPut("Update By ID/{id}")]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserDto dto)
         {
             await _userService.UpdateAsync(id, dto);
             return Ok(new { message = "User updated successfully." });
         }
 
-        [HttpDelete("Delete/By/ID/{id}")]
+        [HttpDelete("Delete By ID/{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
             await _userService.DeleteAsync(id);
