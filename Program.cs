@@ -55,6 +55,8 @@ namespace Crime
             builder.Services.AddScoped<ICaseAssigneesService, CaseAssigneesService>();
             builder.Services.AddScoped<ICaseAssigneesRepo, CaseAssigneesRepo>();
 
+            builder.Services.AddScoped<ICaseCommentRepo, CaseCommentRepo>();
+            builder.Services.AddScoped<ICaseCommentService, CaseCommentService>();
 
             var app = builder.Build();
 

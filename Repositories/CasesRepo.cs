@@ -38,6 +38,30 @@ namespace Crime.Repositories
                 .FirstOrDefaultAsync(c => c.CaseId == id);
         }
 
+        public async Task<IEnumerable<Users>> GetAssigneesByCaseIdAsync(int caseId)
+        {
+            return await _context.CaseAssignees
+                .Where(a => a.CaseId == caseId)
+                .Include(a => a.Users)
+                .Select(a => a.Users)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Evidence>> GetEvidenceByCaseIdAsync(int caseId)
+        {
+            return await _context.Evidences
+                .Where(e => e.CaseId == caseId && !e.IsSoftDeleted)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<CaseParticipants>> GetParticipantsByRoleAsync(int caseId, Role role)
+        {
+            return await _context.CaseParticipants
+                .Where(p => p.CaseId == caseId && p.Role == role)
+                .Include(p => p.Participant)
+                .ToListAsync();
+        }
     }
 }
+
 
