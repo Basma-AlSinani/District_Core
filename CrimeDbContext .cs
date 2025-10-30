@@ -17,6 +17,7 @@ namespace Crime
         public DbSet<CrimeReports> CrimeReports { get; set; }
         public DbSet<Evidence> Evidences { get; set; }
         public DbSet<EvidenceAuditLogs> EvidenceAuditLogs { get; set; }
+        public DbSet<CaseComment> CaseComments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
