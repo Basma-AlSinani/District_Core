@@ -58,6 +58,8 @@ namespace Crime
             builder.Services.AddScoped<ICaseCommentRepo, CaseCommentRepo>();
             builder.Services.AddScoped<ICaseCommentService, CaseCommentService>();
 
+            builder.Services.AddAutoMapper(typeof(Mapping.Mapping));
+
             var app = builder.Build();
 
             if (app.Environment.IsDevelopment())
