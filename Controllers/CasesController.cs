@@ -17,7 +17,7 @@ namespace Crime.Controllers
             _caseService = casesService;
         }
 
-        [HttpPost("Submit/CrimeReport")]
+        [HttpPost("Submit Crime Report")]
         public async Task<IActionResult> SubmitCrimeReport([FromBody] CrimeReportCreateDTO dto)
         {
             var report = await _caseService.SubmitCrimeReportAsync(dto);
@@ -28,7 +28,7 @@ namespace Crime.Controllers
             });
         }
 
-        [HttpPost("Create/New/Case")]
+        [HttpPost("Create New Case")]
         public async Task<IActionResult> CreateCase([FromBody] CaseCreateDTO dto)
         {
             if (dto == null)
@@ -44,7 +44,7 @@ namespace Crime.Controllers
             });
         }
 
-        [HttpPut("update/By/ID/{id}")]
+        [HttpPut("update By ID/{id}")]
         public async Task<IActionResult> UpdateCase(int id, [FromBody] UpdateCaseDTO dto)
         {
             var updatedCase = await _caseService.UpdateCaseAsync(id, dto);
@@ -56,7 +56,7 @@ namespace Crime.Controllers
         }
 
         // Get a list of cases with optional search
-        [HttpGet("Get/All/Cases")]
+        [HttpGet("Get All Cases")]
         public async Task<IActionResult> GetCases([FromQuery] string? search)
         {
             var cases = await _caseService.GetCasesAsync(search);
@@ -64,7 +64,7 @@ namespace Crime.Controllers
         }
 
         // Get case details by ID
-        [HttpGet("Get/By/ID/{id}")]
+        [HttpGet("Get By ID/{id}")]
         public async Task<IActionResult> GetCaseDetails(int id)
         {
             {
