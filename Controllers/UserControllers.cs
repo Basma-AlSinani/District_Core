@@ -18,7 +18,8 @@ namespace Crime.Controllers
     {
         _userService = userService;
     }
-        [HttpPost("Create New User")]
+
+        [HttpPost("CreateNewUser")]
         public async Task<IActionResult> CreateUser([FromBody] UsersCreateDTO dto)
         {
             if (!ModelState.IsValid)
@@ -57,17 +58,15 @@ namespace Crime.Controllers
 
 
 
-
-       
-
-        [HttpPut("Update By ID/{id}")]
+        [HttpPut("UpdateByID/{id}")]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserDto dto)
         {
             await _userService.UpdateAsync(id, dto);
             return Ok(new { message = "User updated successfully." });
         }
 
-        [HttpDelete("Delete By ID/{id}")]
+
+        [HttpDelete("DeleteByID/{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
             await _userService.DeleteAsync(id);
