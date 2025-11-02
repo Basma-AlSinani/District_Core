@@ -8,5 +8,7 @@ namespace Crime.Services
         Task<Users> CreateAsync(Users user);
         Task DeleteAsync(int id);
         Task UpdateAsync(int id, UpdateUserDto dto);
+        string HashPassword(string password);
+
     }
 }

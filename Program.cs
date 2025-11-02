@@ -1,12 +1,8 @@
 using Crime;
+using Crime.Models;
 using Crime.Repositories;
 using Crime.Services;
-
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using System.Security.AccessControl;
-using System.Security.Policy;
-
 
 namespace Crime
 {
@@ -22,7 +18,7 @@ namespace Crime
 
             builder.Services.AddDbContext<CrimeDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-            // register repositories and services
+
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
             builder.Services.AddScoped<IEvidenceRepo, EvidenceRepo>();
@@ -39,15 +35,12 @@ namespace Crime
 
             builder.Services.AddScoped<ICaseParticipantsRepo, CaseParticipantsRepo>();
             builder.Services.AddScoped<ICaseParticipantService, CaseParticipantService>();
-            
+
             builder.Services.AddScoped<IEvidenceAuditLogsRepo, EvidenceAuditLogsRepo>();
             builder.Services.AddScoped<IEvidenceAuditLogsService, EvidenceAuditLogsService>();
 
             builder.Services.AddScoped<ICrimeReportsRepository, CrimeReportsRepo>();
             builder.Services.AddScoped<ICrimeReportsServies, CrimeReportsServies>();
-
-            builder.Services.AddScoped<IEvidenceAuditLogsRepo, EvidenceAuditLogsRepo>();
-            builder.Services.AddScoped<IEvidenceAuditLogsService, EvidenceAuditLogsService>();
 
             builder.Services.AddScoped<ICaseReportRepo, CaseReportRepo>();
             builder.Services.AddScoped<ICaseReportService, CaseReportService>();
@@ -70,9 +63,34 @@ namespace Crime
 
             app.UseHttpsRedirection();
             app.UseMiddleware<Crime.Middleware.Authentication>();
-
             app.UseAuthorization();
             app.MapControllers();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<CrimeDbContext>();
+
+                if (!context.Users.Any(u => u.Username == "admin"))
+                {
+                    using var sha256 = System.Security.Cryptography.SHA256.Create();
+                    var hashBytes = sha256.ComputeHash(System.Text.Encoding.UTF8.GetBytes("Admin123!"));
+                    var hashedPassword = Convert.ToBase64String(hashBytes);
+
+                    context.Users.Add(new Users
+                    {
+                        FirstName = "System",
+                        LastName = "Admin",
+                        Username = "admin",
+                        PasswordHash = hashedPassword,
+                        Email = "admin@crime.gov",
+                        Role = UserRole.Admin,
+                        ClearanceLevel = ClearanceLevel.High
+                    });
+
+                    context.SaveChanges();
+                }
+            }
+
             app.Run();
         }
     }

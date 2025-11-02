@@ -29,7 +29,7 @@ namespace Crime.Controllers
                 LastName = dto.LastName,
                 Email = dto.Email,
                 Username = dto.Username,
-                PasswordHash = dto.Password,
+                PasswordHash = _userService.HashPassword(dto.Password),
                 Role = dto.Role,
                 ClearanceLevel = dto.ClearanceLevel
             };

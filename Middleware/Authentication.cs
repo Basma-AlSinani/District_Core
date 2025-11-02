@@ -6,41 +6,41 @@ namespace Crime.Middleware
     public class Authentication
     {
         private readonly RequestDelegate _next;
-        public Authentication(RequestDelegate next)
+        private readonly IConfiguration _config;
+        public Authentication(RequestDelegate next, IConfiguration config)
         {
             _next = next;
+            _config = config;
         }
         public async Task InvokeAsync(HttpContext context)
         {
             // Skip authentication for PublicReports and Auth endpoints
-            var path = context.Request.Path;
-            if (path.StartsWithSegments("/api/PublicReports") || path.StartsWithSegments("/api/Auth"))
-            {
-                await _next(context);
-                return;
-            }
-
-            // Check for the presence of the Authorization header
-            if (!context.Request.Headers.ContainsKey("Authorization"))
-            {
-                context.Response.StatusCode = 401; // Unauthorized
-                await context.Response.WriteAsync("Authorization header missing");
-                return;
-            }
-
-            var authHeader = AuthenticationHeaderValue.Parse(context.Request.Headers["Authorization"]);
-            var credentialBytes = Convert.FromBase64String(authHeader.Parameter);
-            var credentials = Encoding.UTF8.GetString(credentialBytes).Split(':');
-            var username = credentials[0];
-            var password = credentials[1];
-
-            // Simple hardcoded check for demonstration purposes
-            if (username != "admin" || password != "admin123")
+            var header = context.Request.Headers["Authorization"].ToString();
+            if (string.IsNullOrEmpty(header))
             {
                 context.Response.StatusCode = 401;
-                await context.Response.WriteAsync("Invalid Username or Password");
+                await context.Response.WriteAsync("Missing Authorization header");
                 return;
             }
+
+            var encoded = header.Replace("Basic ", "");
+            var decoded = Encoding.UTF8.GetString(Convert.FromBase64String(encoded));
+            var parts = decoded.Split(':');
+            var username = parts[0];
+            var password = parts[1];
+            // Retrieve valid credentials from configuration
+            var validUser = _config["Authentication:Username"];
+            var validPass = _config["Authentication:Password"];
+
+
+            // Simple hardcoded check for demonstration purposes
+            if (username != validUser || password != validPass)
+            {
+                context.Response.StatusCode = 401;
+                await context.Response.WriteAsync("Invalid credentials");
+                return;
+            }
+
             // If authentication is successful, proceed to the next middleware
 
             await _next(context);
