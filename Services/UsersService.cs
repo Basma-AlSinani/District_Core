@@ -69,6 +69,24 @@ namespace Crime.Services
             var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
             return Convert.ToBase64String(bytes);
         }
+
+        public async Task<bool> ExistsByUsername(string username)
+        {
+            var user = await _userRepository.GetByUsernameAsync(username);
+            return user != null;
+        }
+        public async Task<Users?> AuthenticateAsync(string username, string password)
+        {
+            var user = await _userRepository.GetByUsernameAsync(username);
+            if (user == null) return null;
+
+            using var sha256 = System.Security.Cryptography.SHA256.Create();
+            var hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+            var hashedPassword = Convert.ToBase64String(hashBytes);
+
+            return user.PasswordHash == hashedPassword ? user : null;
+        }
+
     }
 }
 

@@ -3,10 +3,16 @@ using Crime.Mapping;
 using Crime.Models;
 using Crime.Repositories;
 using Crime.Services;
+using Crime.Authentication;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// ===== Environment =====
+builder.Environment.EnvironmentName = "Development";
+
+// ===== Services =====
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -16,8 +22,10 @@ builder.Services.AddSwaggerGen(c =>
         Name = "Authorization",
         Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
         Scheme = "basic",
-        In = Microsoft.OpenApi.Models.ParameterLocation.Header
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Description = "Basic Authentication header"
     });
+
     c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
     {
         {
@@ -29,14 +37,16 @@ builder.Services.AddSwaggerGen(c =>
                     Id = "basic"
                 }
             },
-            new string[]{}
+            new string[] { }
         }
     });
 });
 
+// ===== DbContext =====
 builder.Services.AddDbContext<CrimeDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// ===== Repositories & Services =====
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IEvidenceRepo, EvidenceRepo>();
 builder.Services.AddScoped<IEvidenceService, EvidenceService>();
@@ -58,43 +68,28 @@ builder.Services.AddScoped<ICaseAssigneesService, CaseAssigneesService>();
 builder.Services.AddScoped<ICaseAssigneesRepo, CaseAssigneesRepo>();
 builder.Services.AddScoped<ICaseCommentRepo, CaseCommentRepo>();
 builder.Services.AddScoped<ICaseCommentService, CaseCommentService>();
-builder.Services.AddAutoMapper(typeof(Crime.Mapping.Mapping));
+
+builder.Services.AddAutoMapper(typeof(Mapping));
+
+// ===== Authentication =====
+builder.Services.AddAuthentication("BasicAuthentication")
+    .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-    app.Use(async (context, next) =>
-    {
-        if (context.Request.Path.StartsWithSegments("/swagger"))
-        {
-            if (!context.Request.Headers.ContainsKey("Authorization"))
-            {
-                context.Response.StatusCode = 401;
-                await context.Response.WriteAsync("Unauthorized");
-                return;
-            }
-            var authHeader = System.Net.Http.Headers.AuthenticationHeaderValue.Parse(context.Request.Headers["Authorization"]);
-            var credentials = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(authHeader.Parameter ?? ""));
-            var parts = credentials.Split(':', 2);
-            if (parts.Length != 2 || parts[0] != "admin" || parts[1] != "Admin123!")
-            {
-                context.Response.StatusCode = 401;
-                await context.Response.WriteAsync("Invalid credentials");
-                return;
-            }
-        }
-        await next();
-    });
-}
+// ===== Swagger =====
+app.UseSwagger();
+app.UseSwaggerUI();
 
+// ===== Middleware =====
 app.UseHttpsRedirection();
-app.UseMiddleware<Crime.Middleware.Authentication>();
+app.UseAuthentication();
 app.UseAuthorization();
+
+// ===== Map Controllers =====
 app.MapControllers();
 
+// ===== Seed Default Admin =====
 using (var serviceScope = app.Services.CreateScope())
 {
     var dbContext = serviceScope.ServiceProvider.GetRequiredService<CrimeDbContext>();
@@ -103,6 +98,7 @@ using (var serviceScope = app.Services.CreateScope())
         using var sha256 = System.Security.Cryptography.SHA256.Create();
         var hashBytes = sha256.ComputeHash(System.Text.Encoding.UTF8.GetBytes("Admin123!"));
         var hashedPassword = Convert.ToBase64String(hashBytes);
+
         dbContext.Users.Add(new Users
         {
             FirstName = "System",
@@ -115,6 +111,7 @@ using (var serviceScope = app.Services.CreateScope())
             Role = UserRole.Admin,
             ClearanceLevel = ClearanceLevel.High
         });
+
         dbContext.SaveChanges();
     }
 }

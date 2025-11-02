@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Crime.Controllers
 {
-    [Authorize]
+    [Authorize(Roles ="Admin")] // Only Admins can access user management
     [Route("api/Users")]
     [ApiController]
 
@@ -21,10 +21,18 @@ namespace Crime.Controllers
         [HttpPost("Create New User")]
         public async Task<IActionResult> CreateUser([FromBody] UsersCreateDTO dto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!IsValidEmail(dto.Email))
+                return BadRequest(new { message = "Invalid email format." });
+
+            if (await _userService.ExistsByUsername(dto.Username))
+                return BadRequest(new { message = "Username already exists." });
+
             var firstName = string.IsNullOrWhiteSpace(dto.FirstName) ? "Unknown" : dto.FirstName;
             var secondName = string.IsNullOrWhiteSpace(dto.SecondName) ? "Unknown" : dto.SecondName;
             var lastName = string.IsNullOrWhiteSpace(dto.LastName) ? "User" : dto.LastName;
-
             var fullName = $"{firstName} {secondName} {lastName}".Trim();
 
             var user = new Users
@@ -41,6 +49,9 @@ namespace Crime.Controllers
             };
 
             var createdUser = await _userService.CreateAsync(user);
+
+            
+
             return Ok(createdUser);
         }
 
@@ -62,5 +73,11 @@ namespace Crime.Controllers
             await _userService.DeleteAsync(id);
             return Ok(new { message = "User deleted successfully." });
         }
+
+        private bool IsValidEmail(string email)
+        {
+            return !string.IsNullOrWhiteSpace(email) && email.Contains("@");
+        }
+
     }
 }
