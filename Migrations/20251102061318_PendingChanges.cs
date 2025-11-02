@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Crime.Migrations
 {
     /// <inheritdoc />
-    public partial class initial : Migration
+    public partial class PendingChanges : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -35,7 +35,6 @@ namespace Crime.Migrations
                     Username = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     SecondName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    ThirdName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -132,6 +131,34 @@ namespace Crime.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CaseComments",
+                columns: table => new
+                {
+                    CommentId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CaseId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CaseComments", x => x.CommentId);
+                    table.ForeignKey(
+                        name: "FK_CaseComments_Cases_CaseId",
+                        column: x => x.CaseId,
+                        principalTable: "Cases",
+                        principalColumn: "CaseId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CaseComments_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CaseParticipants",
                 columns: table => new
                 {
@@ -210,7 +237,8 @@ namespace Crime.Migrations
                     LinkedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CaseId = table.Column<int>(type: "int", nullable: false),
                     CrimeReportId = table.Column<int>(type: "int", nullable: false),
-                    PerformedBy = table.Column<int>(type: "int", nullable: true)
+                    PerformedBy = table.Column<int>(type: "int", nullable: true),
+                    CasesCaseId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -221,6 +249,11 @@ namespace Crime.Migrations
                         principalTable: "Cases",
                         principalColumn: "CaseId",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CaseReports_Cases_CasesCaseId",
+                        column: x => x.CasesCaseId,
+                        principalTable: "Cases",
+                        principalColumn: "CaseId");
                     table.ForeignKey(
                         name: "FK_CaseReports_CrimeReports_CrimeReportId",
                         column: x => x.CrimeReportId,
@@ -275,6 +308,16 @@ namespace Crime.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CaseComments_CaseId",
+                table: "CaseComments",
+                column: "CaseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CaseComments_UserId",
+                table: "CaseComments",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CaseParticipants_AddedByUserId",
                 table: "CaseParticipants",
                 column: "AddedByUserId");
@@ -294,6 +337,11 @@ namespace Crime.Migrations
                 table: "CaseReports",
                 columns: new[] { "CaseId", "CrimeReportId" },
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CaseReports_CasesCaseId",
+                table: "CaseReports",
+                column: "CasesCaseId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CaseReports_CrimeReportId",
@@ -341,6 +389,9 @@ namespace Crime.Migrations
         {
             migrationBuilder.DropTable(
                 name: "CaseAssignees");
+
+            migrationBuilder.DropTable(
+                name: "CaseComments");
 
             migrationBuilder.DropTable(
                 name: "CaseParticipants");

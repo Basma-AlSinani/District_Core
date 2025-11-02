@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Crime
 {
-    
     public class CrimeDbContext : DbContext
     {
         public CrimeDbContext(DbContextOptions<CrimeDbContext> options) : base(options) { }
@@ -104,6 +103,19 @@ namespace Crime
                 .WithMany()
                 .HasForeignKey(ea => ea.PerformedByUserId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CaseComment>()
+     .HasOne(cc => cc.User)
+     .WithMany(u => u.CaseComments)
+     .HasForeignKey(cc => cc.UserId)
+     .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CaseComment>()
+                .HasOne(cc => cc.Case)
+                .WithMany(c => c.CaseComments)
+                .HasForeignKey(cc => cc.CaseId)
+                .OnDelete(DeleteBehavior.Cascade);
+
         }
     }
 }

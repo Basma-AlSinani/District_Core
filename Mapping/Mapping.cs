@@ -15,6 +15,15 @@ namespace Crime.Mapping
 
             CreateMap<Cases, CaseListDTO>();
             CreateMap<Cases, CaseDetailsDTO>();
+            CreateMap<UsersCreateDTO, Users>()
+                .ForMember(dest => dest.PasswordHash, opt => opt.Ignore())
+                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => $"{src.FirstName} {src.SecondName} {src.LastName}".Trim()));
+
+            CreateMap<UpdateUserDto, Users>()
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+
+            CreateMap<Users, UsersCreateDTO>();
         }
     }
-}
+    }
+

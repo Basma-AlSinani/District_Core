@@ -54,6 +54,37 @@ namespace Crime.Migrations
                     b.ToTable("CaseAssignees");
                 });
 
+            modelBuilder.Entity("Crime.Models.CaseComment", b =>
+                {
+                    b.Property<int>("CommentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CommentId"));
+
+                    b.Property<int>("CaseId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CommentId");
+
+                    b.HasIndex("CaseId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("CaseComments");
+                });
+
             modelBuilder.Entity("Crime.Models.CaseParticipants", b =>
                 {
                     b.Property<int>("CaseParticipantId")
@@ -99,6 +130,9 @@ namespace Crime.Migrations
                     b.Property<int>("CaseId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("CasesCaseId")
+                        .HasColumnType("int");
+
                     b.Property<int>("CrimeReportId")
                         .HasColumnType("int");
 
@@ -109,6 +143,8 @@ namespace Crime.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("CaseReportId");
+
+                    b.HasIndex("CasesCaseId");
 
                     b.HasIndex("CrimeReportId");
 
@@ -372,11 +408,6 @@ namespace Crime.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("ThirdName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -404,6 +435,25 @@ namespace Crime.Migrations
                     b.Navigation("Cases");
 
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("Crime.Models.CaseComment", b =>
+                {
+                    b.HasOne("Crime.Models.Cases", "Case")
+                        .WithMany("CaseComments")
+                        .HasForeignKey("CaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Crime.Models.Users", "User")
+                        .WithMany("CaseComments")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Case");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Crime.Models.CaseParticipants", b =>
@@ -439,6 +489,10 @@ namespace Crime.Migrations
                         .HasForeignKey("CaseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Crime.Models.Cases", null)
+                        .WithMany("CaseReports")
+                        .HasForeignKey("CasesCaseId");
 
                     b.HasOne("Crime.Models.CrimeReports", "CrimeReports")
                         .WithMany()
@@ -515,6 +569,18 @@ namespace Crime.Migrations
                     b.Navigation("Evidence");
 
                     b.Navigation("PerformedBy");
+                });
+
+            modelBuilder.Entity("Crime.Models.Cases", b =>
+                {
+                    b.Navigation("CaseComments");
+
+                    b.Navigation("CaseReports");
+                });
+
+            modelBuilder.Entity("Crime.Models.Users", b =>
+                {
+                    b.Navigation("CaseComments");
                 });
 #pragma warning restore 612, 618
         }

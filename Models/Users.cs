@@ -35,8 +35,8 @@ namespace Crime.Models
         [MaxLength(50)]
         public string SecondName { get; set; }
 
-        [MaxLength(50)]
-        public string ThirdName { get; set; } 
+        //[MaxLength(50)]
+        //public string ThirdName { get; set; } 
 
         [Required]
         [MaxLength(50)]
@@ -56,5 +56,7 @@ namespace Crime.Models
         [Required]
         public ClearanceLevel ClearanceLevel { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public ICollection<CaseComment> CaseComments { get; set; } = new List<CaseComment>();
+
     }
 }

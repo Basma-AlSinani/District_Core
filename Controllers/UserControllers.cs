@@ -1,10 +1,12 @@
 ﻿using Crime.DTOs;
 using Crime.Models;
 using Crime.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Crime.Controllers
 {
+    [Authorize]
     [Route("api/Users")]
     [ApiController]
 
@@ -16,17 +18,21 @@ namespace Crime.Controllers
     {
         _userService = userService;
     }
-
         [HttpPost("Create New User")]
         public async Task<IActionResult> CreateUser([FromBody] UsersCreateDTO dto)
         {
-            // Map UsersCreateDTO to Users model
+            var firstName = string.IsNullOrWhiteSpace(dto.FirstName) ? "Unknown" : dto.FirstName;
+            var secondName = string.IsNullOrWhiteSpace(dto.SecondName) ? "Unknown" : dto.SecondName;
+            var lastName = string.IsNullOrWhiteSpace(dto.LastName) ? "User" : dto.LastName;
+
+            var fullName = $"{firstName} {secondName} {lastName}".Trim();
+
             var user = new Users
             {
-                FirstName = dto.FirstName,
-                SecondName = dto.SecondName,
-                ThirdName = dto.ThirdName,
-                LastName = dto.LastName,
+                FirstName = firstName,
+                SecondName = secondName,
+                LastName = lastName,
+                FullName = fullName,
                 Email = dto.Email,
                 Username = dto.Username,
                 PasswordHash = _userService.HashPassword(dto.Password),
@@ -34,9 +40,14 @@ namespace Crime.Controllers
                 ClearanceLevel = dto.ClearanceLevel
             };
 
-            var CreateUser = await _userService.CreateAsync(user);
-            return Ok(CreateUser);
+            var createdUser = await _userService.CreateAsync(user);
+            return Ok(createdUser);
         }
+
+
+
+
+       
 
         [HttpPut("Update By ID/{id}")]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserDto dto)

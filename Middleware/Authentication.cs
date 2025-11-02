@@ -1,48 +1,69 @@
-﻿using System.Net.Http.Headers;
+﻿using Crime.Repositories;
+using Microsoft.AspNetCore.Http;
+using System.Net.Http.Headers;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Crime.Middleware
 {
     public class Authentication
     {
         private readonly RequestDelegate _next;
-        private readonly IConfiguration _config;
-        public Authentication(RequestDelegate next, IConfiguration config)
+
+        public Authentication(RequestDelegate next)
         {
             _next = next;
-            _config = config;
         }
-        public async Task InvokeAsync(HttpContext context)
+
+        public async Task Invoke(HttpContext context, IUsersRepo userRepo)
         {
-            // Skip authentication for PublicReports and Auth endpoints
-            var header = context.Request.Headers["Authorization"].ToString();
-            if (string.IsNullOrEmpty(header))
+            var path = context.Request.Path.Value?.ToLower();
+            if (path != null && (path.Contains("/api/citizenreport") || path.Contains("/api/public")))
+            {
+                await _next(context);
+                return;
+            }
+
+            if (!context.Request.Headers.ContainsKey("Authorization"))
             {
                 context.Response.StatusCode = 401;
                 await context.Response.WriteAsync("Missing Authorization header");
                 return;
             }
 
-            var encoded = header.Replace("Basic ", "");
-            var decoded = Encoding.UTF8.GetString(Convert.FromBase64String(encoded));
-            var parts = decoded.Split(':');
-            var username = parts[0];
-            var password = parts[1];
-            // Retrieve valid credentials from configuration
-            var validUser = _config["Authentication:Username"];
-            var validPass = _config["Authentication:Password"];
-
-
-            // Simple hardcoded check for demonstration purposes
-            if (username != validUser || password != validPass)
+            var authHeader = AuthenticationHeaderValue.Parse(context.Request.Headers["Authorization"]);
+            var credentials = Encoding.UTF8.GetString(Convert.FromBase64String(authHeader.Parameter ?? ""));
+            var parts = credentials.Split(':', 2);
+            if (parts.Length != 2)
             {
                 context.Response.StatusCode = 401;
-                await context.Response.WriteAsync("Invalid credentials");
+                await context.Response.WriteAsync("Invalid Authorization header");
                 return;
             }
 
-            // If authentication is successful, proceed to the next middleware
+            var username = parts[0];
+            var password = parts[1];
 
+            var user = await userRepo.GetByUsernameAsync(username);
+            if (user == null)
+            {
+                context.Response.StatusCode = 401;
+                await context.Response.WriteAsync("Invalid username or password");
+                return;
+            }
+
+            using var sha256 = System.Security.Cryptography.SHA256.Create();
+            var hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+            var hashedPassword = Convert.ToBase64String(hashBytes);
+
+            if (user.PasswordHash != hashedPassword)
+            {
+                context.Response.StatusCode = 401;
+                await context.Response.WriteAsync("Invalid username or password");
+                return;
+            }
+
+            context.Items["User"] = user;
             await _next(context);
         }
     }
