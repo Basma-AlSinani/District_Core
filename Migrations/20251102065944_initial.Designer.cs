@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Crime.Migrations
 {
     [DbContext(typeof(CrimeDbContext))]
-    [Migration("20251102061318_PendingChanges")]
-    partial class PendingChanges
+    [Migration("20251102065944_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
