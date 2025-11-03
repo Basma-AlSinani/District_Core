@@ -5,17 +5,17 @@ namespace Crime.Models
 {
     public enum UserRole
     {
-        Admin,
-        Investigator,
-        Officer
+        Admin=0,
+        Investigator=1,
+        Officer=2
     }
 
     public enum ClearanceLevel
     {
-        Low,
-        Medium,
-        High,
-        Critical
+        Low=0,
+        Medium=1,
+        High=2,
+        Critical=3
     }
 
     public class Users
@@ -35,8 +35,7 @@ namespace Crime.Models
         [MaxLength(50)]
         public string SecondName { get; set; }
 
-        //[MaxLength(50)]
-        //public string ThirdName { get; set; } 
+        
 
         [Required]
         [MaxLength(50)]

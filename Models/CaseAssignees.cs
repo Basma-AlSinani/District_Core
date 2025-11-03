@@ -27,6 +27,7 @@ namespace Crime.Models
 
         [Required]
         public ProgreessStatus ProgreessStatus { get; set; }
+
         public DateTime AssignedAt { get; set; }= DateTime.UtcNow;
 
         [ForeignKey("Cases")]
@@ -36,5 +37,9 @@ namespace Crime.Models
         [ForeignKey("Users")]
         public int UserId { get; set; }
         public Users Users { get; set; }
+
+        [ForeignKey("AssignedBy")]
+        public int AssignedByUserId { get; set; }
+        public Users AssignedBy { get; set; }
     }
 }
