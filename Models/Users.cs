@@ -42,7 +42,7 @@ namespace Crime.Models
         public string LastName { get; set; }
 
         public string FullName { get; set; }
-
+        //add unique constraint to email
         [Required, EmailAddress]
         public string Email { get; set; }
 
