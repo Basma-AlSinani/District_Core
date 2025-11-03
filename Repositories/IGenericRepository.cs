@@ -1,5 +1,5 @@
 ﻿
-namespace Crime.Repositories
+namespace CrimeManagment.Repositories
 {
     public interface IGenericRepository<T> where T : class
     {

@@ -1,9 +1,9 @@
-﻿using Crime.DTOs;
-using Crime.Models;
-using Crime.Repositories;
+﻿using CrimeManagment.DTOs;
+using CrimeManagment.Models;
+using CrimeManagment.Repositories;
 using Microsoft.EntityFrameworkCore;
 
-namespace Crime.Services
+namespace CrimeManagment.Services
 {
     public class CaseService : ICaseService
     {

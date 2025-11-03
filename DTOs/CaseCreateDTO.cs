@@ -1,7 +1,7 @@
-﻿using Crime.Models;
+﻿using CrimeManagment.Models;
 using System.ComponentModel.DataAnnotations;
 
-namespace Crime.DTOs
+namespace CrimeManagment.DTOs
 {
     // DTO for creating a new case
     public class CaseCreateDTO

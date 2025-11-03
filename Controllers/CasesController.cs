@@ -1,10 +1,10 @@
-﻿using Crime.DTOs;
-using Crime.Models;
-using Crime.Repositories;
-using Crime.Services;
+﻿using CrimeManagment.DTOs;
+using CrimeManagment.Models;
+using CrimeManagment.Repositories;
+using CrimeManagment.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Crime.Controllers
+namespace CrimeManagment.Controllers
 {
     [Route("api/Cases")]
     [ApiController]

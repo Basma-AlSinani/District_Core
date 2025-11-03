@@ -1,7 +1,7 @@
-﻿using Crime.Repositories;
-using Crime.Models;
+﻿using CrimeManagment.Repositories;
+using CrimeManagment.Models;
 
-namespace Crime.Services
+namespace CrimeManagment.Services
 {
     public class EvidenceAuditLogsService : IEvidenceAuditLogsService
     {

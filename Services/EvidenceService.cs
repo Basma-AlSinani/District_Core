@@ -1,9 +1,9 @@
-﻿using Crime.Repositories;
-using Crime.Models;
-using Crime.DTOs;
+﻿using CrimeManagment.Repositories;
+using CrimeManagment.Models;
+using CrimeManagment.DTOs;
 
 
-namespace Crime.Services
+namespace CrimeManagment.Services
 {
     public class EvidenceService : IEvidenceService
     {

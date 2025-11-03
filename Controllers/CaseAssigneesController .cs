@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Crime.Models;
-using Crime.Services;
-using Crime.DTOs;
-using static Crime.DTOs.CaseAssigneesDTOs;
+using CrimeManagment.Models;
+using CrimeManagment.Services;
+using CrimeManagment.DTOs;
+using static CrimeManagment.DTOs.CaseAssigneesDTOs;
 
-namespace Crime.Controllers
+namespace CrimeManagment.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

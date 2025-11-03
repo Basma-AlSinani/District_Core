@@ -1,9 +1,9 @@
-﻿using Crime.Models;
-using Crime.Repositories;
+﻿using CrimeManagment.Models;
+using CrimeManagment.Repositories;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Crime.Services
+namespace CrimeManagment.Services
 {
     public class ParticipantService : IParticipantService
     {

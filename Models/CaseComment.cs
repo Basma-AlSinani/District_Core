@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
 
-namespace Crime.Models
+namespace CrimeManagment.Models
 {
     // Model representing comments made on cases
     public class CaseComment

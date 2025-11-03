@@ -1,9 +1,9 @@
 ﻿
 using AutoMapper;
-using Crime.DTOs;
-using Crime.Models;
+using CrimeManagment.DTOs;
+using CrimeManagment.Models;
 
-namespace Crime.Mapping
+namespace CrimeManagment.Mapping
 {
     public class Mapping : Profile
     {

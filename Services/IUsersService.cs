@@ -1,7 +1,7 @@
-﻿using Crime.DTOs;
-using Crime.Models;
+﻿using CrimeManagment.DTOs;
+using CrimeManagment.Models;
 
-namespace Crime.Services
+namespace CrimeManagment.Services
 {
     public interface IUsersService
     {

@@ -4,7 +4,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Linq;
 
-namespace Crime.Helpers
+namespace CrimeManagment.Helpers
 {
     public class EnumSchemaFilter : ISchemaFilter
     {

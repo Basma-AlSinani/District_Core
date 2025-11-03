@@ -1,8 +1,8 @@
-﻿using Crime.Models;
-using Crime.Repositories;
+﻿using CrimeManagment.Models;
+using CrimeManagment.Repositories;
 using System.Text.RegularExpressions;
 
-namespace Crime.Services
+namespace CrimeManagment.Services
 {
     public class CaseCommentService : ICaseCommentService
     {

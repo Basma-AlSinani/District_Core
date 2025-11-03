@@ -1,6 +1,6 @@
-﻿using Crime.Models;
+﻿using CrimeManagment.Models;
 
-namespace Crime.Repositories
+namespace CrimeManagment.Repositories
 {
     public interface ICaseCommentRepo
     {
