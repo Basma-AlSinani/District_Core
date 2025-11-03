@@ -18,7 +18,7 @@ namespace Crime.Controllers
             _caseService = casesService;
         }
 
-        [HttpPost("Submit Crime Report")]
+        [HttpPost("SubmitCrimeReport")]
         public async Task<IActionResult> SubmitCrimeReport([FromBody] CrimeReportCreateDTO dto)
         {
             var report = await _caseService.SubmitCrimeReportAsync(dto);
@@ -29,7 +29,7 @@ namespace Crime.Controllers
             });
         }
 
-        [HttpPost("Create New Case")]
+        [HttpPost("CreateNewCase")]
         public async Task<IActionResult> CreateCase([FromBody] CaseCreateDTO dto)
         {
             if (dto == null)
@@ -45,7 +45,7 @@ namespace Crime.Controllers
             });
         }
 
-        [HttpPut("update By ID/{id}")]
+        [HttpPut("updateByID/{id}")]
         public async Task<IActionResult> UpdateCase(int id, [FromBody] UpdateCaseDTO dto)
         {
             var updatedCase = await _caseService.UpdateCaseAsync(id, dto);
@@ -57,7 +57,7 @@ namespace Crime.Controllers
         }
 
         // Get a list of cases with optional search
-        [HttpGet("Get All Cases")]
+        [HttpGet("GetAllCases")]
         public async Task<IActionResult> GetCases([FromQuery] string? search)
         {
             var cases = await _caseService.GetCasesAsync(search);
@@ -65,7 +65,7 @@ namespace Crime.Controllers
         }
 
         // Get case details by ID
-        [HttpGet("Get By ID/{id}")]
+        [HttpGet("GetByID/{id}")]
         public async Task<IActionResult> GetCaseDetails(int id)
         {
             {
@@ -75,7 +75,7 @@ namespace Crime.Controllers
         }
 
         // get All Assignees by ID
-        [HttpGet("Get All Assignees/{caseId}")]
+        [HttpGet("GetAllAssignees/{caseId}")]
         public async Task<IActionResult> GetAllAssignees(int caseId)
         {
             var result = await _caseService.GetAssigneesByCaseIdAsync(caseId);
@@ -84,7 +84,7 @@ namespace Crime.Controllers
         }
 
         // get All Evidence by ID
-        [HttpGet("Get All Evidence/{caseId}")]
+        [HttpGet("GetAllEvidence/{caseId}")]
         public async Task<IActionResult> GetAllEvidence(int caseId)
         {
             var result = await _caseService.GetEvidenceByCaseIdAsync(caseId);
@@ -93,7 +93,7 @@ namespace Crime.Controllers
         }
 
         // get All Suspects by ID
-        [HttpGet("Get All Suspects/{caseId}")]
+        [HttpGet("GetAllSuspects/{caseId}")]
         public async Task<IActionResult> GetAllSuspects(int caseId)
         {
             var result = await _caseService.GetParticipantsByRoleAsync(caseId, Role.Suspect);
@@ -102,7 +102,7 @@ namespace Crime.Controllers
         }
 
         // get All Victims by ID
-        [HttpGet("Get All Victims/{caseId}")]
+        [HttpGet("GetAllVictims/{caseId}")]
         public async Task<IActionResult> GetAllVictims(int caseId)
         {
             var result = await _caseService.GetParticipantsByRoleAsync(caseId, Role.Victim);
@@ -111,7 +111,7 @@ namespace Crime.Controllers
         }
 
         // get All Witnesses by ID
-        [HttpGet("Get All Witnesses/{caseId}")]
+        [HttpGet("GetAllWitnesses/{caseId}")]
         public async Task<IActionResult> GetAllWitnesses(int caseId)
         {
             var result = await _caseService.GetParticipantsByRoleAsync(caseId, Role.Witness);

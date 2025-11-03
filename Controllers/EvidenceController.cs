@@ -17,14 +17,14 @@ namespace Crime.Controllers
             _evidenceService = evidenceService;
         }
 
-        [HttpGet("Get All Evidence")]
+        [HttpGet("GetAllEvidence")]
         public async Task<IActionResult> GetAllEvidence()
         {
             var evidences = await _evidenceService.GetAllAsync();
             return Ok(evidences);
         }
 
-        [HttpGet("Get By ID{id}")]
+        [HttpGet("GetByID/{id}")]
         public async Task<IActionResult> GetEvidenceById(int id)
         {
             var evidence = await _evidenceService.GetByIdAsync(id);
@@ -34,7 +34,7 @@ namespace Crime.Controllers
             return Ok(evidence);
         }
 
-        [HttpPost("Create new evidence")]
+        [HttpPost("CreateNewEvidence")]
         public async Task<IActionResult> CreateEvidence(EvidenceCreateRequest request)
         {
             try
@@ -52,7 +52,7 @@ namespace Crime.Controllers
             }
         }
 
-        [HttpPut("Update text evidence content{id}")]
+        [HttpPut("UpdateTextEvidenceContent/{id}")]
         public async Task<IActionResult> UpdateTextEvidenceContent(int id, EvidenceUpdateTextRequest request)
         {
             try
@@ -66,7 +66,7 @@ namespace Crime.Controllers
             }
         }
 
-        [HttpGet("Image{id}")]
+        [HttpGet("Image/{id}")]
         public async Task<IActionResult> GetEvidenceImage(int id)
         {
             try
@@ -82,7 +82,7 @@ namespace Crime.Controllers
 
         
 
-        [HttpGet("Retrieve{id}")]
+        [HttpGet("Retrieve/{id}")]
         public async Task<IActionResult> RetrieveEvidence(int id)
         {
             try
@@ -112,7 +112,7 @@ namespace Crime.Controllers
             }
         }
 
-        [HttpGet("GetImage {id}")]
+        [HttpGet("GetImage/{id}")]
         public async Task<IActionResult> GetEvidenceImageById(int id)
         {
             try
@@ -136,7 +136,7 @@ namespace Crime.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
-        [HttpPut("Update{id}")]
+        [HttpPut("Update/{id}")]
         public async Task<IActionResult> UpdateEvidence(int id, EvidenceDTOS.EvidenceUpdateTextRequest request)
         {
             try
@@ -153,7 +153,7 @@ namespace Crime.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
-        [HttpDelete("soft delete{id}")]
+        [HttpDelete("SoftDelete/{id}")]
         public async Task<IActionResult> SoftDeleteEvidence(int id)
         {
             try
@@ -171,7 +171,7 @@ namespace Crime.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
-        [HttpDelete("hard delete{id}")]
+        [HttpDelete("HardDelete/{id}")]
         public async Task<IActionResult> HardDeleteEvidence(int id, [FromQuery] string? confirm = null, [FromQuery] string? command = null)
         {
             try
