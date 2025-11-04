@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace CrimeManagment.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class initaial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -174,6 +174,7 @@ namespace CrimeManagment.Migrations
                     CaseId = table.Column<int>(type: "int", nullable: false),
                     ParticipantId = table.Column<int>(type: "int", nullable: false),
                     Role = table.Column<int>(type: "int", nullable: false),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AddedByUserId = table.Column<int>(type: "int", nullable: true),
                     AssignedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },

@@ -107,6 +107,9 @@ namespace CrimeManagment.Migrations
                     b.Property<int>("CaseId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("ParticipantId")
                         .HasColumnType("int");
 

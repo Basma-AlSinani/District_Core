@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CrimeManagment.Migrations
 {
     [DbContext(typeof(CrimeDbContext))]
-    [Migration("20251104060432_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20251104074237_initaial")]
+    partial class initaial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -109,6 +109,9 @@ namespace CrimeManagment.Migrations
 
                     b.Property<int>("CaseId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ParticipantId")
                         .HasColumnType("int");
