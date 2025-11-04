@@ -2,6 +2,7 @@
 using AutoMapper;
 using Crime.DTOs;
 using Crime.Models;
+using CrimeManagment.DTOs;
 
 namespace Crime.Mapping
 {
@@ -23,7 +24,14 @@ namespace Crime.Mapping
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
 
             CreateMap<Users, UsersCreateDTO>();
+
+            // Mapping for CaseParticipants
+            CreateMap<CaseParticipants, CaseParticipantDto>();
+            CreateMap<CreateCaseParticipantDto, CaseParticipants>();
+            CreateMap<UpdateCaseParticipantDto, CaseParticipants>()
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+
         }
     }
-    }
+}
 

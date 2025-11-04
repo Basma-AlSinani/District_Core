@@ -1,5 +1,6 @@
 ﻿using Crime.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace Crime.Repositories
 {
@@ -14,6 +15,11 @@ namespace Crime.Repositories
         public async Task<Participants> GetByPhoneAsync(string phone)
         {
             return await _context.Participants.FirstOrDefaultAsync(p => p.Phone == phone);
+        }
+
+        public async Task<bool> AnyAsync(Expression<Func<Participants, bool>> predicate)
+        {
+            return await _context.Participants.AnyAsync(predicate);
         }
     }
 }
