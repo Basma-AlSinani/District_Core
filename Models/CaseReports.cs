@@ -23,5 +23,8 @@ namespace CrimeManagment.Models
         public int? PerformedBy { get; set; } //to regester who performed the action (linking)
         public Users? Users { get; set; } // navigation property to Users
 
+        [MaxLength(500)]
+        public string? Notes { get; set; }
+
     }
 }

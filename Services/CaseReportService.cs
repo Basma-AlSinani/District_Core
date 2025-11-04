@@ -1,10 +1,14 @@
 ﻿using CrimeManagment.Repositories;
 using CrimeManagment.Models;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+
 namespace CrimeManagment.Services
 {
     public class CaseReportService : ICaseReportService
     {
         private readonly ICaseReportRepo _caseReportRepo;
+
         public CaseReportService(ICaseReportRepo caseReportRepo)
         {
             _caseReportRepo = caseReportRepo;
@@ -27,12 +31,12 @@ namespace CrimeManagment.Services
 
         public async Task<IEnumerable<CaseReports>> GetAllAsync()
         {
-            return await _caseReportRepo.GetAllAsync();
+            return await _caseReportRepo.GetAllWithRelationsAsync();
         }
 
         public async Task<CaseReports> GetByIdAsync(int id)
         {
-            return await _caseReportRepo.GetByIdAsync(id);
+            return await _caseReportRepo.GetDetailsAsync(id);
         }
 
         public async Task AddAsync(CaseReports entity)
@@ -40,18 +44,26 @@ namespace CrimeManagment.Services
             await _caseReportRepo.AddAsync(entity);
         }
 
-        public async Task UpdateAsync(CaseReports entity)
+        public async Task<bool> UpdateAsync(CaseReports entity)
         {
+            var existing = await _caseReportRepo.GetByIdAsync(entity.CaseReportId);
+            if (existing == null)
+                return false;
+
             await _caseReportRepo.UpdateAsync(entity);
+            return true;
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(int id)
         {
             var entity = await _caseReportRepo.GetByIdAsync(id);
-            if (entity != null)
-            {
-                await _caseReportRepo.DeleteAsync(entity);
-            }
+            if (entity == null)
+                return false;
+
+            await _caseReportRepo.DeleteAsync(entity);
+            return true;
         }
     }
 }
+
+
