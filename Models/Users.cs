@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CrimeManagment.Models
@@ -17,7 +18,7 @@ namespace CrimeManagment.Models
         High=2,
         Critical=3
     }
-
+    [Index(nameof(Email), IsUnique = true)]
     public class Users
     {
         [Key]

@@ -11,6 +11,7 @@ namespace CrimeManagment.Services
         string HashPassword(string password);
         Task<bool> ExistsByUsername(string username);
         Task<Users> AuthenticateAsync(string email, string password);
+        Task<Users?> GetByEmailAsync(string email);
 
     }
 }
