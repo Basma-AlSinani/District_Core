@@ -1,5 +1,5 @@
-﻿using Crime.Models;
-using Crime.Services;
+﻿using CrimeManagment.Models;
+using CrimeManagment.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -8,7 +8,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 
-namespace Crime.Authentication
+namespace CrimeManagment.Authentication
 {
     public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {

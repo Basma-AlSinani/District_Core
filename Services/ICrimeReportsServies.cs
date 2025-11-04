@@ -1,6 +1,6 @@
-﻿using Crime.Models;
+﻿using CrimeManagment.Models;
 
-namespace Crime.Services
+namespace CrimeManagment.Services
 {
     public interface ICrimeReportsServies
     {

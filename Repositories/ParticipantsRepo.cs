@@ -1,8 +1,8 @@
-﻿using Crime.Models;
+﻿using CrimeManagment.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-namespace Crime.Repositories
+namespace CrimeManagment.Repositories
 {
     public class ParticipantsRepo : GenericRepository<Participants>, IParticipantsRepo
     {

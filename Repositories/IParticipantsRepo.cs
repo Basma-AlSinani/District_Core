@@ -1,7 +1,7 @@
 ﻿using Crime.Models;
 using System.Linq.Expressions;
 
-namespace Crime.Repositories
+namespace CrimeManagment.Repositories
 {
     public interface IParticipantsRepo : IGenericRepository<Participants>
     {

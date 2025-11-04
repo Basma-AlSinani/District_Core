@@ -1,8 +1,8 @@
-﻿using Crime.Repositories;
-using Crime.Services;
+﻿using CrimeManagment.Repositories;
+using CrimeManagment.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Crime.Controllers
+namespace CrimeManagment.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

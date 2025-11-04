@@ -1,5 +1,5 @@
 ﻿
-namespace Crime.Services
+namespace CrimeManagment.Services
 {
     public interface ICaseCommentService
     {

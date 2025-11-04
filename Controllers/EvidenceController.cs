@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Crime.Services;
-using Crime.Models;
-using static Crime.DTOs.EvidenceDTOS;
-using Crime.DTOs;
+using CrimeManagment.Services;
+using CrimeManagment.Models;
+using static CrimeManagment.DTOs.EvidenceDTOS;
+using CrimeManagment.DTOs;
 
-namespace Crime.Controllers
+namespace CrimeManagment.Controllers
 {
     [Route("api/Evidence")]
     [ApiController]

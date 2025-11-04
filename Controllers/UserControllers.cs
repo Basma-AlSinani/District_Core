@@ -1,10 +1,10 @@
-﻿using Crime.DTOs;
-using Crime.Models;
-using Crime.Services;
+﻿using CrimeManagment.DTOs;
+using CrimeManagment.Models;
+using CrimeManagment.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Crime.Controllers
+namespace CrimeManagment.Controllers
 {
     [Authorize(Roles ="Admin")] // Only Admins can access user management
     [Route("api/Users")]

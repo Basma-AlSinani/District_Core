@@ -1,13 +1,13 @@
-﻿using Crime.DTOs;
-using Crime.Models;
-using Crime.Repositories;
+﻿using CrimeManagment.DTOs;
+using CrimeManagment.Models;
+using CrimeManagment.Repositories;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
 
 
-namespace Crime.Services
+namespace CrimeManagment.Services
 {
     public class UsersService : IUsersService
     {

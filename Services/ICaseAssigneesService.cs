@@ -1,4 +1,4 @@
-﻿using Crime.Models;
+﻿using CrimeManagment.Models;
 
 public interface ICaseAssigneesService
 {

@@ -1,4 +1,4 @@
-﻿namespace Crime.DTOs
+﻿namespace CrimeManagment.DTOs
 {
     public class CaseDetailsDTO
     {

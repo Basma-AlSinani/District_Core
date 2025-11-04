@@ -1,6 +1,6 @@
-﻿using Crime.Repositories;
-using Crime.Models;
-namespace Crime.Services
+﻿using CrimeManagment.Repositories;
+using CrimeManagment.Models;
+namespace CrimeManagment.Services
 {
     public class CrimeReportsServies : ICrimeReportsServies
     {

@@ -1,7 +1,7 @@
-﻿using Crime.Models;
+﻿using CrimeManagment.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Crime.Repositories
+namespace CrimeManagment.Repositories
 {
     public class EvidenceAuditLogsRepo : GenericRepository<EvidenceAuditLogs>, IEvidenceAuditLogsRepo
     {

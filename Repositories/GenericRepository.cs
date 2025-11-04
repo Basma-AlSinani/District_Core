@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Crime.Repositories
+namespace CrimeManagment.Repositories
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {

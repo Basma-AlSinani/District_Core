@@ -1,8 +1,8 @@
-﻿using Crime.Models;
+﻿using CrimeManagment.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 
-namespace Crime.Repositories
+namespace CrimeManagment.Repositories
 {
     public class CrimeReportsRepo : GenericRepository<CrimeReports>, ICrimeReportsRepository
     {

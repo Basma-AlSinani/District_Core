@@ -1,6 +1,6 @@
-﻿using Crime.Models;
+﻿using CrimeManagment.Models;
 
-namespace Crime.DTOs
+namespace CrimeManagment.DTOs
 {
     public class CaseListDTO
     {

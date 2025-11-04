@@ -1,14 +1,14 @@
-﻿using Crime.Models;
+﻿using CrimeManagment.Models;
 using System.ComponentModel.DataAnnotations;
 
-namespace Crime.DTOs
+namespace CrimeManagment.DTOs
 {
     public class UsersCreateDTO
     {
         [Required(ErrorMessage = "First name is required.")]
         public string FirstName { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Second name is required.")]
         public string SecondName { get; set; }
 
        // public string? ThirdName { get; set; }

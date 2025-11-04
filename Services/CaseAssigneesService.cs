@@ -1,7 +1,7 @@
-﻿using Crime.Models;
-using Crime.Repositories;
+﻿using CrimeManagment.Models;
+using CrimeManagment.Repositories;
 
-namespace Crime.Services
+namespace CrimeManagment.Services
 {
     public class CaseAssigneesService : ICaseAssigneesService
     {

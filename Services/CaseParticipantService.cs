@@ -1,12 +1,10 @@
-﻿using Crime.Models;
+﻿using CrimeManagment.Models;
 using AutoMapper;
-using Crime.DTOs;
-using Crime.Models;
-using Crime.Repositories;
-using Microsoft.EntityFrameworkCore;
 using CrimeManagment.DTOs;
+using CrimeManagment.Repositories;
+using Microsoft.EntityFrameworkCore;
 
-namespace Crime.Services
+namespace CrimeManagment.Services
 {
     public class CaseParticipantService : ICaseParticipantService
     {

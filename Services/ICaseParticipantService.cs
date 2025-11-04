@@ -1,6 +1,6 @@
 ﻿using CrimeManagment.DTOs;
 
-namespace Crime.Services
+namespace CrimeManagment.Services
 {
     public interface ICaseParticipantService
     {

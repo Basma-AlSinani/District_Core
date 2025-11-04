@@ -1,6 +1,6 @@
 ﻿
-using Crime.Models;
-namespace Crime.Repositories
+using CrimeManagment.Models;
+namespace CrimeManagment.Repositories
 {
     public class EvidenceRepo : GenericRepository<Evidence>, IEvidenceRepo
     {

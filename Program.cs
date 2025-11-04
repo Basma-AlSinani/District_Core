@@ -1,14 +1,14 @@
-﻿using Crime;
-using Crime.Mapping;
-using Crime.Models;
-using Crime.Repositories;
-using Crime.Services;
-using Crime.Authentication;
+﻿using CrimeManagment;
+using CrimeManagment.Mapping;
+using CrimeManagment.Models;
+using CrimeManagment.Repositories;
+using CrimeManagment.Services;
+using CrimeManagment.Authentication;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using System.Text;
-using Crime.Helpers;
+using CrimeManagment.Helpers;
 using System.Text.Json.Serialization;
 
 
