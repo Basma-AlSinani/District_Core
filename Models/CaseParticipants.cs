@@ -26,6 +26,7 @@ namespace CrimeManagment.Models
 
         [Required]
         public Role Role { get; set; }
+        public string? Notes { get; set; }
 
         [ForeignKey(nameof(Users))]
         public int? AddedByUserId { get; set; } //FK to Users

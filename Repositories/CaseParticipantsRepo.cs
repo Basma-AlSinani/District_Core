@@ -1,5 +1,6 @@
 ﻿using CrimeManagment.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace CrimeManagment.Repositories
 {
@@ -11,6 +12,7 @@ namespace CrimeManagment.Repositories
             _context = context;
         }
 
+        // Get CaseParticipants by CaseId
         public async Task<IEnumerable<CaseParticipants>> GetByCaseIdAsync(int caseId)
         {
             return await _context.CaseParticipants
@@ -20,12 +22,20 @@ namespace CrimeManagment.Repositories
                 .ToListAsync();
         }
 
+        // Get CaseParticipants by ParticipantId
         public async Task<IEnumerable<CaseParticipants>> GetByParticipantIdAsync(int participantId)
         {
             return await _context.CaseParticipants
                 .Include(cp => cp.Case)
                 .Where(cp => cp.ParticipantId == participantId)
                 .ToListAsync();
+        }
+
+        // Check if any CaseParticipants match the given predicate
+        // Expression<Func<CaseParticipants -- means we can pass any condition we want to check
+        public async Task<bool> AnyAsync(Expression<Func<CaseParticipants, bool>> predicate)
+        {
+            return await _context.CaseParticipants.AnyAsync(predicate);
         }
     }
 }

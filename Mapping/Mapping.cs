@@ -23,7 +23,14 @@ namespace CrimeManagment.Mapping
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
 
             CreateMap<Users, UsersCreateDTO>();
+
+            // Mapping for CaseParticipants
+            CreateMap<CaseParticipants, CaseParticipantDto>();
+            CreateMap<CreateCaseParticipantDto, CaseParticipants>();
+            CreateMap<UpdateCaseParticipantDto, CaseParticipants>()
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+
         }
     }
-    }
+}
 
