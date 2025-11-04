@@ -75,12 +75,12 @@ namespace CrimeManagment.Services
             var user = await _userRepository.GetByUsernameAsync(username);
             return user != null;
         }
-        public async Task<Users?> AuthenticateAsync(string username, string password)
+        public async Task<Users?> AuthenticateAsync(string email, string password)
         {
-            var user = await _userRepository.GetByUsernameAsync(username);
+            var user = await _userRepository.GetByEmailAsync(email);
             if (user == null) return null;
 
-            using var sha256 = System.Security.Cryptography.SHA256.Create();
+            using var sha256 =SHA256.Create();
             var hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
             var hashedPassword = Convert.ToBase64String(hashBytes);
 

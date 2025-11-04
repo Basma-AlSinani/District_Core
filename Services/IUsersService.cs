@@ -10,7 +10,7 @@ namespace CrimeManagment.Services
         Task UpdateAsync(int id, UpdateUserDto dto);
         string HashPassword(string password);
         Task<bool> ExistsByUsername(string username);
-        Task<Users> AuthenticateAsync(string username, string password);
+        Task<Users> AuthenticateAsync(string email, string password);
 
     }
 }

@@ -3,24 +3,23 @@ using CrimeManagment.Mapping;
 using CrimeManagment.Models;
 using CrimeManagment.Repositories;
 using CrimeManagment.Services;
-using CrimeManagment.Authentication;
-using Microsoft.AspNetCore.Authentication;
+using CrimeManagment.Helpers;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
 using System.Text;
-using CrimeManagment.Helpers;
 using System.Text.Json.Serialization;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
 // ======================
-// 🌍 Environment
+//  Environment
 // ======================
 builder.Environment.EnvironmentName = "Development";
 
 // ======================
-// 📦 Services
+//  Services
 // ======================
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -31,17 +30,18 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 
 // ======================
-// 🧾 Swagger Configuration
+//  Swagger Configuration
 // ======================
 builder.Services.AddSwaggerGen(c =>
 {
-    c.AddSecurityDefinition("basic", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
         Name = "Authorization",
         Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
-        Scheme = "basic",
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
         In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-        Description = "Basic Authentication header"
+        Description = "Enter JWT token like: Bearer {token}"
     });
 
     c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
@@ -52,71 +52,83 @@ builder.Services.AddSwaggerGen(c =>
                 Reference = new Microsoft.OpenApi.Models.OpenApiReference
                 {
                     Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
-                    Id = "basic"
+                    Id = "Bearer"
                 }
             },
             new string[] { }
         }
     });
 
-    
     c.SchemaFilter<EnumSchemaFilter>();
 });
 
-
-
 // ======================
-// 🗄️ Database Context
+//  Database Context
 // ======================
 builder.Services.AddDbContext<CrimeDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // ======================
-// 🧩 Dependency Injection
+//  Dependency Injection
 // ======================
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IEvidenceRepo, EvidenceRepo>();
 builder.Services.AddScoped<IEvidenceService, EvidenceService>();
-
 builder.Services.AddScoped<ICasesRepo, CasesRepo>();
 builder.Services.AddScoped<ICaseService, CaseService>();
-
 builder.Services.AddScoped<IParticipantsRepo, ParticipantsRepo>();
 builder.Services.AddScoped<IParticipantService, ParticipantService>();
-
 builder.Services.AddScoped<IUsersRepo, UsersRepo>();
 builder.Services.AddScoped<IUsersService, UsersService>();
-
 builder.Services.AddScoped<ICaseParticipantsRepo, CaseParticipantsRepo>();
 builder.Services.AddScoped<ICaseParticipantService, CaseParticipantService>();
-
 builder.Services.AddScoped<IEvidenceAuditLogsRepo, EvidenceAuditLogsRepo>();
 builder.Services.AddScoped<IEvidenceAuditLogsService, EvidenceAuditLogsService>();
-
 builder.Services.AddScoped<ICrimeReportsRepository, CrimeReportsRepo>();
 builder.Services.AddScoped<ICrimeReportsServies, CrimeReportsServies>();
-
 builder.Services.AddScoped<ICaseReportRepo, CaseReportRepo>();
 builder.Services.AddScoped<ICaseReportService, CaseReportService>();
-
 builder.Services.AddScoped<ICaseAssigneesRepo, CaseAssigneesRepo>();
 builder.Services.AddScoped<ICaseAssigneesService, CaseAssigneesService>();
-
 builder.Services.AddScoped<ICaseCommentRepo, CaseCommentRepo>();
 builder.Services.AddScoped<ICaseCommentService, CaseCommentService>();
-
 builder.Services.AddAutoMapper(typeof(Mapping));
 
 // ======================
-// 🔐 Authentication
+//  JWT Authentication
 // ======================
-builder.Services.AddAuthentication("BasicAuthentication")
-    .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
+var jwtKey = builder.Configuration["Jwt:Key"];
+var jwtIssuer = builder.Configuration["Jwt:Issuer"];
 
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtIssuer,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+    };
+});
+
+builder.Services.AddAuthorization();
+
+builder.Services.AddScoped<IAuthService, AuthService>();
+
+// ======================
+//  Build App
+// ======================
 var app = builder.Build();
 
 // ======================
-// 🚀 Middleware
+//  Middleware
 // ======================
 if (app.Environment.IsDevelopment())
 {
@@ -130,7 +142,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 // ======================
-// 👑 Seed Default Admin
+//  Seed Default Admin
 // ======================
 using (var scope = app.Services.CreateScope())
 {
@@ -161,6 +173,6 @@ using (var scope = app.Services.CreateScope())
 }
 
 // ======================
-// ▶️ Run App
+// ▶ Run App
 // ======================
 app.Run();

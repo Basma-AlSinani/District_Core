@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Crime.Migrations
+namespace CrimeManagment.Migrations
 {
     /// <inheritdoc />
-    public partial class initial : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -111,7 +111,8 @@ namespace Crime.Migrations
                     ProgreessStatus = table.Column<int>(type: "int", nullable: false),
                     AssignedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CaseId = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false)
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    AssignedByUserId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -122,6 +123,12 @@ namespace Crime.Migrations
                         principalTable: "Cases",
                         principalColumn: "CaseId",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CaseAssignees_Users_AssignedByUserId",
+                        column: x => x.AssignedByUserId,
+                        principalTable: "Users",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_CaseAssignees_Users_UserId",
                         column: x => x.UserId,
@@ -296,6 +303,11 @@ namespace Crime.Migrations
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Restrict);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CaseAssignees_AssignedByUserId",
+                table: "CaseAssignees",
+                column: "AssignedByUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CaseAssignees_CaseId",
