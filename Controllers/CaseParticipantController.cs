@@ -1,5 +1,5 @@
 ﻿using CrimeManagment.DTOs;
-using Crime.Services;
+using CrimeManagment.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 

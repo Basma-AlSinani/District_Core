@@ -1,4 +1,4 @@
-﻿using Crime.Models;
+﻿using CrimeManagment.Models;
 using System.Linq.Expressions;
 
 namespace CrimeManagment.Repositories
