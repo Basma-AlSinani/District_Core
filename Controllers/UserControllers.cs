@@ -36,7 +36,14 @@ namespace CrimeManagment.Controllers
             var secondName = string.IsNullOrWhiteSpace(dto.SecondName) ? "Unknown" : dto.SecondName;
             var lastName = string.IsNullOrWhiteSpace(dto.LastName) ? "User" : dto.LastName;
             var fullName = $"{firstName} {secondName} {lastName}".Trim();
-
+            if(!Enum.IsDefined(typeof(UserRole), dto.Role))
+            {
+                return BadRequest(new { message = "Invalid user role. You must choose from: 0.Admin, 1.Investigator, 2.Officer." });
+            }
+            if(!Enum.IsDefined(typeof(ClearanceLevel), dto.ClearanceLevel))
+            {
+                return BadRequest(new { message = "Invalid clearance level. You must choose from: 0.Low, 1.Medium, 2.High, 3.Critical." });
+            }
             var user = new Users
             {
                 FirstName = firstName,
