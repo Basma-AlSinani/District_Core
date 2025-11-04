@@ -20,7 +20,7 @@ namespace CrimeManagment.Controllers
     }
 
         [HttpPost("CreateNewUser")]
-        public async Task<IActionResult> CreateUser([FromBody] UsersCreateDTO dto)
+        public async Task<IActionResult> CreateUser(UsersCreateDTO dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -28,8 +28,9 @@ namespace CrimeManagment.Controllers
             if (!IsValidEmail(dto.Email))
                 return BadRequest(new { message = "Invalid email format." });
 
-            if (await _userService.ExistsByUsername(dto.Username))
-                return BadRequest(new { message = "Username already exists." });
+            if (await _userService.GetByEmailAsync(dto.Email) != null)
+                return BadRequest(new { message = "Email already exists." });
+
 
             var firstName = string.IsNullOrWhiteSpace(dto.FirstName) ? "Unknown" : dto.FirstName;
             var secondName = string.IsNullOrWhiteSpace(dto.SecondName) ? "Unknown" : dto.SecondName;

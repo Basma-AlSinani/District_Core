@@ -22,6 +22,9 @@ namespace CrimeManagment.Services
         // Create a new user
         public async Task<Users> CreateAsync(Users user)
         {
+            var existingUser = await _userRepository.GetByEmailAsync(user.Email);
+            if (existingUser != null)
+                throw new Exception("A user with this email already exists.");
             await _userRepository.AddAsync(user);
             await _userRepository.SaveChangesAsync();
             return user;
@@ -85,6 +88,11 @@ namespace CrimeManagment.Services
             var hashedPassword = Convert.ToBase64String(hashBytes);
 
             return user.PasswordHash == hashedPassword ? user : null;
+        }
+
+        public async Task<Users?> GetByEmailAsync(string email)
+        {
+            return await _userRepository.GetByEmailAsync(email);
         }
 
     }
