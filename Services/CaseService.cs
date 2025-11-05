@@ -101,27 +101,6 @@ namespace CrimeManagment.Services
             return existingCase;
         }
 
-        // Submit crime report
-        public async Task<CrimeReports> SubmitCrimeReportAsync(CrimeReportCreateDTO dto)
-        {
-            var report = new CrimeReports
-            {
-                Title = dto.Title,
-                Description = dto.Description,
-                AreaCity = dto.AreaCity,
-                Latitude = dto.Latitude,
-                Longitude = dto.Longitude,
-                ReportDataTime = DateTime.UtcNow,
-                CrimeStatus = CrimeStatus.reported,
-                UserId = dto.UserId ?? 0
-            };
-
-            await _crimeReportsRepo.AddAsync(report);
-            await _crimeReportsRepo.SaveChangesAsync();
-
-            return report;
-        }
-
         // Get all cases
         public async Task<IEnumerable<CaseListDTO>> GetCasesAsync()
         {
@@ -176,6 +155,31 @@ namespace CrimeManagment.Services
                 NumberOfWitnesses = witnessesCount
             };
         }
+
+        public async Task<bool> DeleteCaseAsync(int caseId)
+        {
+            // Check if the case exists
+            var existingCase = await _caseRepository.GetByIdAsync(caseId);
+            if (existingCase == null)
+                return false;
+
+            // Delete related CaseReports to avoid foreign key constraint issues
+            var relatedReports = await _caseReportsRepo
+                .GetAllAsync();
+
+            // Delete the case
+            var toRemove = relatedReports.Where(r => r.CaseId == caseId).ToList();
+            foreach (var item in toRemove)
+            {
+                await _caseReportsRepo.DeleteAsync(item);
+            }
+
+            // delete casas
+            await _caseRepository.DeleteAsync(existingCase);
+
+            return true;
+        }
+
 
         // Get assignees by case ID
         public async Task<IEnumerable<object>> GetAssigneesByCaseIdAsync(int caseId)

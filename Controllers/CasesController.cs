@@ -18,17 +18,6 @@ namespace CrimeManagment.Controllers
             _caseService = casesService;
         }
 
-        [HttpPost("SubmitCrimeReport")]
-        public async Task<IActionResult> SubmitCrimeReport([FromBody] CrimeReportCreateDTO dto)
-        {
-            var report = await _caseService.SubmitCrimeReportAsync(dto);
-            return Ok(new
-            {
-                Message = "Crime report submitted successfully",
-                CrimeReportId = report.CrimeReportId
-            });
-        }
-
         [HttpPost("CreateNewCase")]
         public async Task<IActionResult> CreateCase([FromBody] CaseCreateDTO dto)
         {
@@ -72,6 +61,16 @@ namespace CrimeManagment.Controllers
                 var caseDetails = await _caseService.GetCaseDetailsAsync(id);
                 return Ok(caseDetails);
             }
+        }
+
+        [HttpDelete("DeleteCaseById{caseId}")]
+        public async Task<IActionResult> DeleteCase(int caseId)
+        {
+            var result = await _caseService.DeleteCaseAsync(caseId);
+            if (!result)
+                return NotFound(new { Message = "Case not found" });
+
+            return Ok(new { Message = "Case deleted successfully" });
         }
 
 
