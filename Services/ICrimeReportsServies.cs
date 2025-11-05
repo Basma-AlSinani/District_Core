@@ -1,15 +1,17 @@
-﻿using CrimeManagment.Models;
+﻿using CrimeManagementApi.DTOs;
+using CrimeManagment.Models;
 
 namespace CrimeManagment.Services
 {
     public interface ICrimeReportsServies
     {
         Task AddAsync(CrimeReports report);
+        Task<CrimeReportDto?> CreateReportAsync(CreateCrimeReportDto dto);
         Task DeleteAsync(int id);
-        Task<IEnumerable<CrimeReports>> GetAllAsync();
-        Task<CrimeReports> GetByIdAsync(int id);
-        Task<IEnumerable<CrimeReports>> GetReportsByUserIdAsync(int userId);
-        Task<IEnumerable<CrimeReports>> SearchAsync(string keyword);
+        Task<IEnumerable<CrimeReportDto>> GetAllAsync();
+        Task<CrimeReportDto?> GetByIdAsync(int id);
+        Task<string> GetStatusAsync(int id);
+        Task<IEnumerable<CrimeReportDto>> SearchAsync(string keyword);
         Task UpdateReportStatusAsync(int reportId, CrimeStatus newStatus);
     }
 }

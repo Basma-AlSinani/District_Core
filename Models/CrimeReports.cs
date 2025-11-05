@@ -5,12 +5,12 @@ namespace CrimeManagment.Models
 {
     public enum CrimeStatus
     {
-        pending,
-        en_route,
-        on_scene,
-        under_investigation,
-        resolved,
-        reported
+        Pending,
+        En_route,
+        On_scene,
+        Under_investigation,
+        Resolved,
+        Reported
     }
     public class CrimeReports
     {
@@ -19,11 +19,11 @@ namespace CrimeManagment.Models
         public int CrimeReportId { get; set; }
         [Required]
         public string Title { get; set; }
-        [Required, MaxLength(100)]
+        [Required, MaxLength(500)]
         public string Description { get; set; }
         [Required]
         public string AreaCity { get; set; }
-        public DateTime ReportDataTime { get; set; }
+        public DateTime ReportDataTime { get; set; } = DateTime.UtcNow;
         [Required]
         public CrimeStatus CrimeStatus { get; set; }
 
@@ -32,6 +32,7 @@ namespace CrimeManagment.Models
         [ForeignKey("Users")]
         public int UserId { get; set; }
         public Users Users { get; set; }
-
+        // Navigation property for related CaseReports
+        public ICollection<CaseReports> CaseReports { get; set; } = new List<CaseReports>();
     }
 }

@@ -1,5 +1,7 @@
 ﻿using CrimeManagment.Repositories;
 using CrimeManagment.Models;
+using CrimeManagementApi.DTOs;
+using Microsoft.EntityFrameworkCore;
 namespace CrimeManagment.Services
 {
     public class CrimeReportsServies : ICrimeReportsServies
@@ -10,46 +12,120 @@ namespace CrimeManagment.Services
             _repo = repo;
         }
 
-        public async Task<IEnumerable<CrimeReports>> GetAllAsync()
-        {
-            return await _repo.GetAllAsync();
-        }
-
-        public async Task<CrimeReports> GetByIdAsync(int id)
-        {
-            var report = await _repo.GetByIdAsync(id);
-            if (report == null)
-                throw new Exception("Report not found");
-            return report;
-        }
-        public async Task<IEnumerable<CrimeReports>> GetReportsByUserIdAsync(int userId)
-        {
-            return await _repo.GetReportsByUserIdAsync(userId);
-        }
-
-        public async Task<IEnumerable<CrimeReports>> SearchAsync(string keyword)
-        {
-            return await _repo.SearchAsync(keyword);
-        }
-
+        // Add a new CrimeReports entity
         public async Task AddAsync(CrimeReports report)
         {
             await _repo.AddAsync(report);
         }
 
+        // Create a new report
+        public async Task<CrimeReportDto?> CreateReportAsync(CreateCrimeReportDto dto)
+        {
+            var entity = new CrimeReports
+            {
+                Title = dto.Title,
+                Description = dto.Description,
+                AreaCity = dto.AreaCity ?? string.Empty,
+                Latitude = dto.Latitude ?? 0,
+                Longitude = dto.Longitude ?? 0,
+                CrimeStatus = CrimeStatus.Pending,
+                ReportDataTime = DateTime.UtcNow,
+                UserId = dto.ReportedByUserId ?? 0
+            };
+
+            await _repo.AddAsync(entity);
+
+            return new CrimeReportDto
+            {
+                Id = entity.CrimeReportId,
+                Title = entity.Title,
+                Description = entity.Description,
+                AreaCity = entity.AreaCity,
+                Latitude = entity.Latitude,
+                Longitude = entity.Longitude,
+                Status = entity.CrimeStatus.ToString(),
+                ReportDateTime = entity.ReportDataTime
+            };
+        }
+
+        // Get all reports
+        public async Task<IEnumerable<CrimeReportDto>> GetAllAsync()
+        {
+            var list = await _repo.GetAllAsync();
+
+            return list.Select(entity => new CrimeReportDto
+            {
+                Id = entity.CrimeReportId,
+                Title = entity.Title,
+                Description = entity.Description,
+                AreaCity = entity.AreaCity,
+                Latitude = entity.Latitude,
+                Longitude = entity.Longitude,
+                Status = entity.CrimeStatus.ToString(),
+                ReportDateTime = entity.ReportDataTime
+            });
+        }
+
+        // Get a single report by ID
+        public async Task<CrimeReportDto?> GetByIdAsync(int id)
+        {
+            var entity = await _repo.GetByIdAsync(id);
+            if (entity == null) return null;
+
+            return new CrimeReportDto
+            {
+                Id = entity.CrimeReportId,
+                Title = entity.Title,
+                Description = entity.Description,
+                AreaCity = entity.AreaCity,
+                Latitude = entity.Latitude,
+                Longitude = entity.Longitude,
+                Status = entity.CrimeStatus.ToString(),
+                ReportDateTime = entity.ReportDataTime
+            };
+        }
+
+        // Get only the status of a report
+        public async Task<string> GetStatusAsync(int id)
+        {
+            var entity = await _repo.GetByIdAsync(id);
+            return entity?.CrimeStatus.ToString() ?? "Not Found";
+        }
+
+        // Search reports by keyword in title or description
+        public async Task<IEnumerable<CrimeReportDto>> SearchAsync(string keyword)
+        {
+            var list = await _repo.SearchAsync(keyword);
+
+            return list.Select(entity => new CrimeReportDto
+            {
+                Id = entity.CrimeReportId,
+                Title = entity.Title,
+                Description = entity.Description,
+                AreaCity = entity.AreaCity,
+                Latitude = entity.Latitude,
+                Longitude = entity.Longitude,
+                Status = entity.CrimeStatus.ToString(),
+                ReportDateTime = entity.ReportDataTime
+            });
+        }
+
+        // Update report status
         public async Task UpdateReportStatusAsync(int reportId, CrimeStatus newStatus)
         {
             await _repo.UpdateReportStatusAsync(reportId, newStatus);
         }
 
+        // Delete a report
         public async Task DeleteAsync(int id)
         {
             var report = await _repo.GetByIdAsync(id);
-            if (report == null)
-                throw new Exception("Report not found");
-
-            await _repo.DeleteAsync(report);
+            if (report != null)
+            {
+                await _repo.DeleteAsync(report);
+            }
         }
-
     }
 }
+
+
