@@ -16,6 +16,20 @@ namespace CrimeManagment.Controllers
         {
             _evidenceService = evidenceService;
         }
+        [HttpPost("CreateTextEvidence")]
+        public async Task<IActionResult> CreateTextEvidence([FromBody] EvidenceDTOS.CreateTextEvidenceRequest request)
+        {
+            var result = await _evidenceService.CreateTextEvidenceAsync(request);
+            return Ok(new { message = "Text evidence created successfully", evidence = result });
+        }
+
+        [HttpPost("CreateImageEvidence")]
+        public async Task<IActionResult> CreateImageEvidence([FromForm] EvidenceDTOS.CreateImageEvidenceRequest request)
+        {
+            var result = await _evidenceService.CreateImageEvidenceAsync(request);
+            return Ok(new { message = "Image evidence created successfully", evidence = result });
+        }
+
 
         [HttpGet("GetAllEvidence")]
         public async Task<IActionResult> GetAllEvidence()
@@ -34,23 +48,7 @@ namespace CrimeManagment.Controllers
             return Ok(evidence);
         }
 
-        [HttpPost("CreateNewEvidence")]
-        public async Task<IActionResult> CreateEvidence(EvidenceCreateRequest request)
-        {
-            try
-            {
-                var createdEvidence = await _evidenceService.RecordEvidenceAsync(request);
-                return Ok(new
-                {
-                    message = "Evidence created successfully",
-                    evidence = createdEvidence
-                });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
+       
 
         [HttpPut("UpdateTextEvidenceContent/{id}")]
         public async Task<IActionResult> UpdateTextEvidenceContent(int id, EvidenceUpdateTextRequest request)
