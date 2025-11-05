@@ -78,16 +78,16 @@ namespace CrimeManagment.Services
         }
 
         // Delete a user by ID
-        public async Task DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(int id)
         {
             var user = await _userRepository.GetByIdAsync(id);
 
             if (user == null)
-                throw new Exception("User not found.");
+                return false;
 
             await _userRepository.DeleteAsync(user);
             await _userRepository.SaveChangesAsync();
-
+            return true;
         }
 
         public string HashPassword(string password)

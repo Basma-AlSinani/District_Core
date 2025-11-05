@@ -7,7 +7,7 @@ namespace CrimeManagment.Services
     {
         Task<Users?> AuthenticateAsync(string email, string password);
         Task<Users> CreateAsync(Users user);
-        Task DeleteAsync(int id);
+        Task<bool> DeleteAsync(int id);
         Task<bool> ExistsByUsername(string username);
         Task<IEnumerable<UserDTO>> GetAllUsersAsync();
         Task<Users?> GetByEmailAsync(string email);

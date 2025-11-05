@@ -77,6 +77,10 @@ namespace CrimeManagment.Controllers
         [HttpDelete("DeleteByID/{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
+            var user = await _userService.GetUserByIdAsync(id);
+            if (user == null)
+                return NotFound(new { message = $"User with ID {id} not found." });
+
             await _userService.DeleteAsync(id);
             return Ok(new { message = "User deleted successfully." });
         }
