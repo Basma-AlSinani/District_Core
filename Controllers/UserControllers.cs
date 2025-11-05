@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CrimeManagment.Controllers
 {
     [Authorize(Roles ="Admin")] // Only Admins can access user management
-    [Route("api/Users")]
+    [Route("api/[controller]")]
     [ApiController]
 
     public class UserControllers : ControllerBase

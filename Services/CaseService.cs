@@ -122,44 +122,33 @@ namespace CrimeManagment.Services
             return report;
         }
 
-        // Get list of cases with optional search
-        public async Task<IEnumerable<CaseListDTO>> GetCasesAsync(string? search = null)
+        // Get all cases
+        public async Task<IEnumerable<CaseListDTO>> GetCasesAsync()
         {
-            var query = _caseRepository.GetAllAsync().Result.AsQueryable()
-                .Include(c => c.CreatedByUser)
-                .AsQueryable(); // Ensure we have IQueryable for filtering
+            var cases = await _caseRepository.GetAllAsync();
 
-            if (!string.IsNullOrEmpty(search))
+            var result = cases.Select(c => new CaseListDTO
             {
-                search = search.ToLower();
-                query = query.Where(c =>
-                    c.Name.ToLower().Contains(search) ||
-                    c.Description.ToLower().Contains(search));
-            }
+                CaseNumber = c.CaseNumber,
+                Name = c.Name,
+                Description = c.Description,
+                AreaCity = c.AreaCity,
+                CaseType = c.CaseType,
+                AuthorizationLevel = c.AuthorizationLevel,
+                CreatedBy = $"{c.CreatedByUser.FirstName} {c.CreatedByUser.LastName}",
+                CreatedAt = c.CreatedAt
+            });
 
-            var list = await query
-                .Select(c => new CaseListDTO
-                {
-                    CaseNumber = c.CaseNumber,
-                    Name = c.Name,
-                    Description = c.Description,
-                    AreaCity = c.AreaCity,
-                    CaseType = c.CaseType,
-                    AuthorizationLevel = c.AuthorizationLevel,
-                    CreatedBy = $"{c.CreatedByUser.FirstName} {c.CreatedByUser.LastName}",
-                    CreatedAt = c.CreatedAt
-                })
-                .ToListAsync();
-
-            return list;
+            return result;
         }
+
 
         public async Task<CaseDetailsDTO> GetCaseDetailsAsync(int id)
         {
             var caseEntity = await _caseRepository.GetCaseDetailsByIdAsync(id);
             if (caseEntity == null)
                 throw new Exception("Case not found");
-            
+
             int assigneesCount = 0;
             int evidencesCount = 0;
             int suspectsCount = 0;

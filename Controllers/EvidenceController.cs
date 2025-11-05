@@ -6,7 +6,7 @@ using CrimeManagment.DTOs;
 
 namespace CrimeManagment.Controllers
 {
-    [Route("api/Evidence")]
+    [Route("api/[controller]")]
     [ApiController]
     public class EvidenceController : ControllerBase
     {

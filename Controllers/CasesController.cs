@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CrimeManagment.Controllers
 {
-    [Route("api/Cases")]
+    [Route("api/[controller]")]
     [ApiController]
 
     public class CasesController : ControllerBase
@@ -58,9 +58,9 @@ namespace CrimeManagment.Controllers
 
         // Get a list of cases with optional search
         [HttpGet("GetAllCases")]
-        public async Task<IActionResult> GetCases([FromQuery] string? search)
+        public async Task<IActionResult> GetCases()
         {
-            var cases = await _caseService.GetCasesAsync(search);
+            var cases = await _caseService.GetCasesAsync();
             return Ok(cases);
         }
 
@@ -73,6 +73,7 @@ namespace CrimeManagment.Controllers
                 return Ok(caseDetails);
             }
         }
+
 
         // get All Assignees by ID
         [HttpGet("GetAllAssignees/{caseId}")]

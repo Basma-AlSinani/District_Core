@@ -1,4 +1,6 @@
 ﻿
+using System.Linq.Expressions;
+
 namespace CrimeManagment.Repositories
 {
     public interface IGenericRepository<T> where T : class
@@ -9,5 +11,6 @@ namespace CrimeManagment.Repositories
         Task<T> GetByIdAsync(int id);
         Task SaveChangesAsync();
         Task UpdateAsync(T entity);
+        Task<bool> AnyAsync(Expression<Func<T, bool>> predicate);
     }
 }
