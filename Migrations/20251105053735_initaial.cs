@@ -246,6 +246,7 @@ namespace CrimeManagment.Migrations
                     CaseId = table.Column<int>(type: "int", nullable: false),
                     CrimeReportId = table.Column<int>(type: "int", nullable: false),
                     PerformedBy = table.Column<int>(type: "int", nullable: true),
+                    Notes = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     CasesCaseId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
