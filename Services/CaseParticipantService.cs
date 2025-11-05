@@ -45,8 +45,7 @@ namespace CrimeManagment.Services
                 return null;
 
             // Validate Case & Participant existence
-            var caseExists = await _casesRepo.GetAllQueryable()
-                .AnyAsync(c => c.CaseId == dto.CaseId);
+            var caseExists = await _casesRepo.AnyAsync(c => c.CaseId == dto.CaseId);
 
             var participantExists = await _participantsRepo.AnyAsync(
                 p => p.ParticipantsId == dto.ParticipantId
@@ -82,6 +81,7 @@ namespace CrimeManagment.Services
         {
             var cp = await _caseParticipantRepo.GetByIdAsync(id);
             if (cp == null) return false;
+
 
             await _caseParticipantRepo.DeleteAsync(cp);
             await _caseParticipantRepo.SaveChangesAsync();

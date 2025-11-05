@@ -35,14 +35,8 @@ namespace CrimeManagementApi.Controllers
 
             _logger.LogInformation("User {Email} logged in.", response.Email);
             return Ok(response);
+
         }
 
-        [HttpGet("secure-test")]
-        [Authorize]
-        public IActionResult SecureTest()
-        {
-            var userEmail = User.Identity?.Name;
-            return Ok($"Hello {userEmail}, you accessed a protected route!");
-        }
     }
 }

@@ -101,65 +101,33 @@ namespace CrimeManagment.Services
             return existingCase;
         }
 
-        // Submit crime report
-        public async Task<CrimeReports> SubmitCrimeReportAsync(CrimeReportCreateDTO dto)
+        // Get all cases
+        public async Task<IEnumerable<CaseListDTO>> GetCasesAsync()
         {
-            var report = new CrimeReports
+            var cases = await _caseRepository.GetAllAsync();
+
+            var result = cases.Select(c => new CaseListDTO
             {
-                Title = dto.Title,
-                Description = dto.Description,
-                AreaCity = dto.AreaCity,
-                Latitude = dto.Latitude,
-                Longitude = dto.Longitude,
-                ReportDataTime = DateTime.UtcNow,
-                CrimeStatus = CrimeStatus.reported,
-                UserId = dto.UserId ?? 0
-            };
+                CaseNumber = c.CaseNumber,
+                Name = c.Name,
+                Description = c.Description,
+                AreaCity = c.AreaCity,
+                CaseType = c.CaseType,
+                AuthorizationLevel = c.AuthorizationLevel,
+                CreatedBy = $"{c.CreatedByUser.FirstName} {c.CreatedByUser.LastName}",
+                CreatedAt = c.CreatedAt
+            });
 
-            await _crimeReportsRepo.AddAsync(report);
-            await _crimeReportsRepo.SaveChangesAsync();
-
-            return report;
+            return result;
         }
 
-        // Get list of cases with optional search
-        public async Task<IEnumerable<CaseListDTO>> GetCasesAsync(string? search = null)
-        {
-            var query = _caseRepository.GetAllAsync().Result.AsQueryable()
-                .Include(c => c.CreatedByUser)
-                .AsQueryable(); // Ensure we have IQueryable for filtering
-
-            if (!string.IsNullOrEmpty(search))
-            {
-                search = search.ToLower();
-                query = query.Where(c =>
-                    c.Name.ToLower().Contains(search) ||
-                    c.Description.ToLower().Contains(search));
-            }
-
-            var list = await query
-                .Select(c => new CaseListDTO
-                {
-                    CaseNumber = c.CaseNumber,
-                    Name = c.Name,
-                    Description = c.Description,
-                    AreaCity = c.AreaCity,
-                    CaseType = c.CaseType,
-                    AuthorizationLevel = c.AuthorizationLevel,
-                    CreatedBy = $"{c.CreatedByUser.FirstName} {c.CreatedByUser.LastName}",
-                    CreatedAt = c.CreatedAt
-                })
-                .ToListAsync();
-
-            return list;
-        }
 
         public async Task<CaseDetailsDTO> GetCaseDetailsAsync(int id)
         {
             var caseEntity = await _caseRepository.GetCaseDetailsByIdAsync(id);
             if (caseEntity == null)
                 throw new Exception("Case not found");
-            
+
             int assigneesCount = 0;
             int evidencesCount = 0;
             int suspectsCount = 0;
@@ -187,6 +155,31 @@ namespace CrimeManagment.Services
                 NumberOfWitnesses = witnessesCount
             };
         }
+
+        public async Task<bool> DeleteCaseAsync(int caseId)
+        {
+            // Check if the case exists
+            var existingCase = await _caseRepository.GetByIdAsync(caseId);
+            if (existingCase == null)
+                return false;
+
+            // Delete related CaseReports to avoid foreign key constraint issues
+            var relatedReports = await _caseReportsRepo
+                .GetAllAsync();
+
+            // Delete the case
+            var toRemove = relatedReports.Where(r => r.CaseId == caseId).ToList();
+            foreach (var item in toRemove)
+            {
+                await _caseReportsRepo.DeleteAsync(item);
+            }
+
+            // delete casas
+            await _caseRepository.DeleteAsync(existingCase);
+
+            return true;
+        }
+
 
         // Get assignees by case ID
         public async Task<IEnumerable<object>> GetAssigneesByCaseIdAsync(int caseId)

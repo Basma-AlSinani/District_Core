@@ -18,14 +18,14 @@ namespace CrimeManagment.Repositories
                 .FirstOrDefaultAsync(c => c.CaseNumber == caseNumber);
         }
 
-        // Get all cases as a queryable
-        public IQueryable<Cases> GetAllQueryable()
+        // Get all cases 
+        public async Task<IEnumerable<Cases>> GetAllAsync()
         {
-            return _context.Cases
+            return await _context.Cases
                 .Include(c => c.CreatedByUser)
-                .AsQueryable();
-
+                .ToListAsync();
         }
+
 
         // Get case details by ID with related data
         public async Task<Cases> GetCaseDetailsByIdAsync(int id)

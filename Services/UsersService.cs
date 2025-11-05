@@ -25,6 +25,17 @@ namespace CrimeManagment.Services
             var existingUser = await _userRepository.GetByEmailAsync(user.Email);
             if (existingUser != null)
                 throw new Exception("A user with this email already exists.");
+
+            // Validate Clearance Level Restrictions based on Role
+            if (user.Role == UserRole.Investigator && user.ClearanceLevel > ClearanceLevel.High)
+            {
+                throw new Exception("Investigator cannot have a Clearance Level higher than High (2).");
+            }
+
+            if (user.Role == UserRole.Officer && user.ClearanceLevel != ClearanceLevel.Low)
+            {
+                throw new Exception("Officer can only have Clearance Level Low (0).");
+            }
             await _userRepository.AddAsync(user);
             await _userRepository.SaveChangesAsync();
             return user;
@@ -48,6 +59,17 @@ namespace CrimeManagment.Services
 
             if (!string.IsNullOrWhiteSpace(dto.Email))
                 user.Email = dto.Email;
+
+            // Restrict role clearance relationships during update
+            if (user.Role == UserRole.Investigator && user.ClearanceLevel > ClearanceLevel.High)
+            {
+                throw new Exception("Investigator cannot have Clearance Level higher than High (2).");
+            }
+
+            if (user.Role == UserRole.Officer && user.ClearanceLevel != ClearanceLevel.Low)
+            {
+                throw new Exception("Officer can only have Clearance Level Low (0).");
+            }
 
             await _userRepository.UpdateAsync(user);
             await _userRepository.SaveChangesAsync();

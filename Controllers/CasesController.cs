@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CrimeManagment.Controllers
 {
-    [Route("api/Cases")]
+    [Route("api/[controller]")]
     [ApiController]
 
     public class CasesController : ControllerBase
@@ -16,17 +16,6 @@ namespace CrimeManagment.Controllers
         public CasesController(ICaseService casesService)
         {
             _caseService = casesService;
-        }
-
-        [HttpPost("SubmitCrimeReport")]
-        public async Task<IActionResult> SubmitCrimeReport([FromBody] CrimeReportCreateDTO dto)
-        {
-            var report = await _caseService.SubmitCrimeReportAsync(dto);
-            return Ok(new
-            {
-                Message = "Crime report submitted successfully",
-                CrimeReportId = report.CrimeReportId
-            });
         }
 
         [HttpPost("CreateNewCase")]
@@ -58,9 +47,9 @@ namespace CrimeManagment.Controllers
 
         // Get a list of cases with optional search
         [HttpGet("GetAllCases")]
-        public async Task<IActionResult> GetCases([FromQuery] string? search)
+        public async Task<IActionResult> GetCases()
         {
-            var cases = await _caseService.GetCasesAsync(search);
+            var cases = await _caseService.GetCasesAsync();
             return Ok(cases);
         }
 
@@ -73,6 +62,17 @@ namespace CrimeManagment.Controllers
                 return Ok(caseDetails);
             }
         }
+
+        [HttpDelete("DeleteCaseById{caseId}")]
+        public async Task<IActionResult> DeleteCase(int caseId)
+        {
+            var result = await _caseService.DeleteCaseAsync(caseId);
+            if (!result)
+                return NotFound(new { Message = "Case not found" });
+
+            return Ok(new { Message = "Case deleted successfully" });
+        }
+
 
         // get All Assignees by ID
         [HttpGet("GetAllAssignees/{caseId}")]
