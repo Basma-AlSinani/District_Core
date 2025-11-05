@@ -1,4 +1,5 @@
 ﻿using CrimeManagment.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace CrimeManagment.DTOs
 {
@@ -13,6 +14,31 @@ namespace CrimeManagment.DTOs
             public string? Remarks { get; set; }
 
             public Users CreatedByUser { get; set; } //user who is adding the evidence
+        }
+        public class CreateTextEvidenceRequest
+        {
+            [Required]
+            public int CaseId { get; set; }
+            [Required]
+            public string TextContent { get; set; } = string.Empty;
+            public string? Remarks { get; set; }
+            [Required]
+            public int CreatedByUserId { get; set; }
+            
+
+        }
+
+        public class CreateImageEvidenceRequest
+        {
+            [Required]
+            public int CaseId { get; set; }
+            [Required]
+            public IFormFile File { get; set; } 
+            public string? Remarks { get; set; }
+            [Required]
+            public int CreatedByUserId { get; set; }
+            
+
         }
 
         public class EvidenceUpdateTextRequest

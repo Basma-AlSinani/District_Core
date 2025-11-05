@@ -1,6 +1,7 @@
 ﻿using CrimeManagment.Repositories;
 using CrimeManagment.Models;
 using CrimeManagment.DTOs;
+using static CrimeManagment.DTOs.EvidenceDTOS;
 
 
 namespace CrimeManagment.Services
@@ -8,9 +9,11 @@ namespace CrimeManagment.Services
     public class EvidenceService : IEvidenceService
     {
         private readonly IEvidenceRepo _evidenceRepo;
-        public EvidenceService(IEvidenceRepo evidenceRepo)
+        private readonly IUsersRepo _userRepo;
+        public EvidenceService(IEvidenceRepo evidenceRepo,IUsersRepo usersRepo)
         {
             _evidenceRepo = evidenceRepo;
+            _userRepo = usersRepo;
         }
 
         public async Task<IEnumerable<Evidence>> GetAllAsync()
@@ -58,46 +61,67 @@ namespace CrimeManagment.Services
         {
             await _evidenceRepo.UpdateContentAsync(id, textcontent, remarks);
         }
-
-        public async Task<Evidence> RecordEvidenceAsync(EvidenceDTOS.EvidenceCreateRequest request)
+        public async Task<Evidence> CreateTextEvidenceAsync(CreateTextEvidenceRequest request)
         {
+            var user= await _userRepo.GetByIdAsync(request.CreatedByUserId);
+            if (user==null)
+                throw new Exception("User not found");
+
             var evidence = new Evidence
             {
                 CaseId = request.CaseId,
-                Type = request.Type,
+                Type = EvidenceType.Text,
+                TextContent = request.TextContent,
                 Remarks = request.Remarks,
                 CreatedAt = DateTime.UtcNow,
-                AddedByUser = request.CreatedByUser,
+                AddedByUser = user
             };
 
-            if (request.Type == EvidenceType.Text)
-            {
-                evidence.TextContent = request.TextContent;
-            }
-            else
-                if (request.Type == EvidenceType.Image && request.File != null)
-            {
-                var uploadDictory = Path.Combine("wwroot", "evidences");
-                if (!Directory.Exists(uploadDictory))
-                {
-                    Directory.CreateDirectory(uploadDictory);
-                }
-
-                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(request.File.FileName);
-                var filePath = Path.Combine(uploadDictory, fileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await request.File.CopyToAsync(stream);
-                }
-
-                evidence.FileUrl = filePath;
-                evidence.MimeType = request.File.ContentType;
-                evidence.SizeBytes = request.File.Length;
-            }
             await _evidenceRepo.AddAsync(evidence);
             return evidence;
         }
+
+        public async Task<Evidence> CreateImageEvidenceAsync(EvidenceDTOS.CreateImageEvidenceRequest request)
+        {
+            var user = await _userRepo.GetByIdAsync(request.CreatedByUserId);
+            if (user == null)
+                throw new Exception("User not found");
+            if (request.File == null)
+                throw new ArgumentException("Image file is required.");
+
+            if (!request.File.ContentType.StartsWith("image/"))
+                throw new ArgumentException("Invalid image format.");
+
+            var uploadDirectory = Path.Combine("wwwroot", "evidences");
+            if (!Directory.Exists(uploadDirectory))
+            {
+                Directory.CreateDirectory(uploadDirectory);
+            }
+
+            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(request.File.FileName);
+            var filePath = Path.Combine(uploadDirectory, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await request.File.CopyToAsync(stream);
+            }
+
+            var evidence = new Evidence
+            {
+                CaseId = request.CaseId,
+                Type = EvidenceType.Image,
+                FileUrl = filePath,
+                MimeType = request.File.ContentType,
+                SizeBytes = request.File.Length,
+                Remarks = request.Remarks,
+                CreatedAt = DateTime.UtcNow,
+                AddedByUser = user
+            };
+
+            await _evidenceRepo.AddAsync(evidence);
+            return evidence;
+        }
+
     }
 }
 
