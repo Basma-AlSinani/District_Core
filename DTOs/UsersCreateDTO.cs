@@ -11,7 +11,7 @@ namespace CrimeManagment.DTOs
         [Required(ErrorMessage = "Second name is required.")]
         public string SecondName { get; set; }
 
-       // public string? ThirdName { get; set; }
+        // public string? ThirdName { get; set; }
 
         [Required(ErrorMessage = "Last name is required.")]
         public string LastName { get; set; }
@@ -37,5 +37,14 @@ namespace CrimeManagment.DTOs
         public UserRole? Role { get; set; }
         public ClearanceLevel? ClearanceLevel { get; set; }
         public string? Email { get; set; }
+    }
+
+    public class UserDTO
+    {
+        public int UserId { get; set; }
+        public string FullName { get; set; }
+        public string Email { get; set; }
+        public UserRole Role { get; set; }
+        public ClearanceLevel ClearanceLevel { get; set; }
     }
 }

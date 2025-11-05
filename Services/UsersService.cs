@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
+using AutoMapper;
 
 
 namespace CrimeManagment.Services
@@ -12,12 +13,13 @@ namespace CrimeManagment.Services
     public class UsersService : IUsersService
     {
         private readonly IUsersRepo _userRepository;
+        private readonly IMapper _mapper;
 
-        public UsersService(IUsersRepo userRepository)
+        public UsersService(IUsersRepo userRepository, IMapper mapper)
         {
             _userRepository = userRepository;
+            _mapper = mapper;
         }
-
 
         // Create a new user
         public async Task<Users> CreateAsync(Users user)
@@ -105,7 +107,7 @@ namespace CrimeManagment.Services
             var user = await _userRepository.GetByEmailAsync(email);
             if (user == null) return null;
 
-            using var sha256 =SHA256.Create();
+            using var sha256 = SHA256.Create();
             var hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
             var hashedPassword = Convert.ToBase64String(hashBytes);
 
@@ -117,6 +119,17 @@ namespace CrimeManagment.Services
             return await _userRepository.GetByEmailAsync(email);
         }
 
+        public async Task<IEnumerable<UserDTO>> GetAllUsersAsync()
+        {
+            var users = await _userRepository.GetAllAsync();
+            return _mapper.Map<IEnumerable<UserDTO>>(users);
+        }
+
+        public async Task<UserDTO?> GetUserByIdAsync(int id)
+        {
+            var user = await _userRepository.GetByIdAsync(id);
+            return _mapper.Map<UserDTO?>(user);
+        }
     }
 }
 

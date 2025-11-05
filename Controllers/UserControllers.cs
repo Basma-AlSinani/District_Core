@@ -86,5 +86,24 @@ namespace CrimeManagment.Controllers
             return !string.IsNullOrWhiteSpace(email) && email.Contains("@");
         }
 
+        // Get All Users 
+        [HttpGet("GetAllUsers")]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            var users = await _userService.GetAllUsersAsync();
+            return Ok(users);
+        }
+
+        // Get User By ID
+        [HttpGet("GetUserById/{id}")]
+        public async Task<IActionResult> GetUserById(int id)
+        {
+            var user = await _userService.GetUserByIdAsync(id);
+
+            if (user == null)
+                return NotFound(new { message = $"User with ID {id} not found." });
+
+            return Ok(user);
+        }
     }
 }
