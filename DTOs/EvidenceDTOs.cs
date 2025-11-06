@@ -25,7 +25,13 @@ namespace CrimeManagment.DTOs
             [Required]
             public int CreatedByUserId { get; set; }
             
+        }
+        public class DeleteEvidenceRequest
+        {
+            [Required]
+            public string Confirm { get; set; } = string.Empty;
 
+            public string? Command { get; set; }
         }
 
         public class CreateImageEvidenceRequest

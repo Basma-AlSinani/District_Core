@@ -3,9 +3,11 @@ using CrimeManagment.Services;
 using CrimeManagment.Models;
 using static CrimeManagment.DTOs.EvidenceDTOS;
 using CrimeManagment.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CrimeManagment.Controllers
 {
+    [Authorize(Roles = "Admin,Investigator,Officer")]
     [Route("api/[controller]")]
     [ApiController]
     public class EvidenceController : ControllerBase
@@ -16,100 +18,103 @@ namespace CrimeManagment.Controllers
         {
             _evidenceService = evidenceService;
         }
+
+        // Helper: Map Evidence to Response
+        private EvidenceResponse MapToResponse(Evidence evidence)
+        {
+            return new EvidenceResponse
+            {
+                EvidenceId = evidence.EvidenceId,
+                CaseId = evidence.CaseId,
+                TextContent = evidence.TextContent,
+                FileUrl = evidence.FileUrl,
+                MimeType = evidence.MimeType,
+                SizeBytes = evidence.Type == EvidenceType.Image ? evidence.SizeBytes : null,
+                Remarks = evidence.Remarks,
+                Type = evidence.Type.ToString(),
+                CreatedAt = evidence.CreatedAt,
+                UpdatedAt = evidence.UpdatedAt
+            };
+        }
+
+        // Create Text Evidence
         [HttpPost("CreateTextEvidence")]
-        public async Task<IActionResult> CreateTextEvidence([FromBody] EvidenceDTOS.CreateTextEvidenceRequest request)
+        public async Task<IActionResult> CreateTextEvidence([FromBody] CreateTextEvidenceRequest request)
         {
-            var result = await _evidenceService.CreateTextEvidenceAsync(request);
-            return Ok(new { message = "Text evidence created successfully", evidence = result });
+            try
+            {
+                var evidence = await _evidenceService.CreateTextEvidenceAsync(request);
+                return Ok(new { message = "Text evidence created successfully", evidence = MapToResponse(evidence) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
+        // Create Image Evidence
         [HttpPost("CreateImageEvidence")]
-        public async Task<IActionResult> CreateImageEvidence([FromForm] EvidenceDTOS.CreateImageEvidenceRequest request)
+        public async Task<IActionResult> CreateImageEvidence([FromForm] CreateImageEvidenceRequest request)
         {
-            var result = await _evidenceService.CreateImageEvidenceAsync(request);
-            return Ok(new { message = "Image evidence created successfully", evidence = result });
+            try
+            {
+                var evidence = await _evidenceService.CreateImageEvidenceAsync(request);
+                return Ok(new { message = "Image evidence created successfully", evidence = MapToResponse(evidence) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
-
+        // Get All Evidence
         [HttpGet("GetAllEvidence")]
         public async Task<IActionResult> GetAllEvidence()
         {
             var evidences = await _evidenceService.GetAllAsync();
-            return Ok(evidences);
+            var response = evidences.Select(MapToResponse);
+            return Ok(response);
         }
 
+        // Get Evidence by ID
         [HttpGet("GetByID/{id}")]
         public async Task<IActionResult> GetEvidenceById(int id)
-        {
-            var evidence = await _evidenceService.GetByIdAsync(id);
-            if (evidence == null)
-                return NotFound(new { message = "Evidence not found" });
-
-            return Ok(evidence);
-        }
-
-       
-
-        [HttpPut("UpdateTextEvidenceContent/{id}")]
-        public async Task<IActionResult> UpdateTextEvidenceContent(int id, EvidenceUpdateTextRequest request)
-        {
-            try
-            {
-                await _evidenceService.UpdateContentAsync(id, request.TextContent, request.Remarks);
-                return Ok(new { message = "Evidence content updated successfully" });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        [HttpGet("Image/{id}")]
-        public async Task<IActionResult> GetEvidenceImage(int id)
-        {
-            try
-            {
-                var imageData = await _evidenceService.GetEvidenceImageAsync(id);
-                return File(imageData, "image/jpeg");
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        
-
-        [HttpGet("Retrieve/{id}")]
-        public async Task<IActionResult> RetrieveEvidence(int id)
         {
             try
             {
                 var evidence = await _evidenceService.GetByIdAsync(id);
                 if (evidence == null)
-                    return NotFound(new { message = "Evidence not found or is not soft deleted" });
+                    return NotFound(new { message = "Evidence not found" });
 
-                var response = new EvidenceResponse
-                {
-                    EvidenceId = evidence.EvidenceId,
-                    CaseId = evidence.CaseId,
-                    TextContent = evidence.TextContent,
-                    FileUrl = evidence.FileUrl,
-                    MimeType = evidence.MimeType,
-                    SizeBytes = evidence.Type == EvidenceType.Image ? evidence.SizeBytes : null,
-                    Remarks = evidence.Remarks,
-                    Type = evidence.Type.ToString(),
-                    CreatedAt = evidence.CreatedAt,
-                    UpdatedAt = evidence.UpdatedAt
-                };
-                return Ok(response);
+                return Ok(MapToResponse(evidence));
             }
-            catch
+            catch (Exception ex)
             {
-                return BadRequest();
+                return BadRequest(new { message = ex.Message });
             }
         }
 
+        // Update Text Content
+        [Authorize(Roles = "Admin,Investigator")]
+        [HttpPut("UpdateTextEvidenceContent/{id}")]
+        public async Task<IActionResult> UpdateTextEvidenceContent(int id, EvidenceUpdateTextRequest request)
+        {
+            try
+            {
+                var evidence = await _evidenceService.GetByIdAsync(id);
+                if (evidence == null)
+                    return NotFound(new { message = "Evidence not found" });
+
+                await _evidenceService.UpdateContentAsync(id, request.TextContent, request.Remarks);
+                return Ok(new { message = "Evidence content updated successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        // Get Image File
         [HttpGet("GetImage/{id}")]
         public async Task<IActionResult> GetEvidenceImageById(int id)
         {
@@ -123,7 +128,6 @@ namespace CrimeManagment.Controllers
                     return BadRequest(new { message = "Evidence is not an image" });
 
                 var imageBytes = await _evidenceService.GetEvidenceImageAsync(id);
-
                 if (imageBytes == null || imageBytes.Length == 0)
                     return NotFound(new { message = "Image file not found or empty." });
 
@@ -134,23 +138,9 @@ namespace CrimeManagment.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
-        [HttpPut("Update/{id}")]
-        public async Task<IActionResult> UpdateEvidence(int id, EvidenceDTOS.EvidenceUpdateTextRequest request)
-        {
-            try
-            {
-                var evidence = await _evidenceService.GetByIdAsync(id);
-                if (evidence == null)
-                    return NotFound(new { message = "Evidence not found" });
 
-                await _evidenceService.UpdateContentAsync(id, request.TextContent, request.Remarks);
-                return Ok(new { message = "Evidence updated successfully (type not changed)" });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
+        // Soft Delete
+        [Authorize(Roles = "Admin,Investigator")]
         [HttpDelete("SoftDelete/{id}")]
         public async Task<IActionResult> SoftDeleteEvidence(int id)
         {
@@ -161,7 +151,6 @@ namespace CrimeManagment.Controllers
                     return NotFound(new { message = "Evidence not found" });
 
                 await _evidenceService.SoftDeleteAsync(id);
-
                 return Ok(new { message = "Evidence soft deleted successfully and audit log recorded." });
             }
             catch (Exception ex)
@@ -169,8 +158,11 @@ namespace CrimeManagment.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        // Hard Delete
+        [Authorize(Roles = "Admin")]
         [HttpDelete("HardDelete/{id}")]
-        public async Task<IActionResult> HardDeleteEvidence(int id, [FromQuery] string? confirm = null, [FromQuery] string? command = null)
+        public async Task<IActionResult> HardDeleteEvidence(int id, [FromBody] DeleteEvidenceRequest request)
         {
             try
             {
@@ -178,17 +170,10 @@ namespace CrimeManagment.Controllers
                 if (evidence == null)
                     return NotFound(new { message = $"Evidence with ID {id} not found." });
 
-                if (confirm == null)
-                    return BadRequest(new { message = $"Are you sure you want to permanently delete Evidence ID: {id}? (yes/no)" });
-
-                if (confirm?.ToLower() != "yes")
+                if (request.Confirm.ToLower() != "yes")
                     return Ok(new { message = "Deletion canceled by user." });
 
-                if (string.IsNullOrWhiteSpace(command) || command != $"DELETE {id}")
-                    return BadRequest(new { message = $"To confirm deletion, send: DELETE {id}" });
-
                 await _evidenceService.HardDeleteAsync(id);
-
                 return Ok(new { message = $"Evidence ID {id} permanently deleted and logged for audit." });
             }
             catch (Exception ex)
@@ -197,6 +182,23 @@ namespace CrimeManagment.Controllers
             }
         }
 
+        // Retrieve Soft Deleted Evidence
+        [Authorize(Roles = "Admin,Investigator")]
+        [HttpGet("Retrieve/{id}")]
+        public async Task<IActionResult> RetrieveEvidence(int id)
+        {
+            try
+            {
+                var evidence = await _evidenceService.GetByIdAsync(id);
+                if (evidence == null)
+                    return NotFound(new { message = "Evidence not found or is not soft deleted" });
 
+                return Ok(MapToResponse(evidence));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }
