@@ -1,5 +1,6 @@
 ﻿
 using AutoMapper;
+using CrimeManagementApi.DTOs;
 using CrimeManagment.DTOs;
 using CrimeManagment.Models;
 
@@ -11,7 +12,7 @@ namespace CrimeManagment.Mapping
         {
             CreateMap<CaseCreateDTO, Cases>();
             CreateMap<UpdateCaseDTO, Cases>();
-            CreateMap<CrimeReportCreateDTO, CrimeReports>();
+            CreateMap<CrimeReportDto, CrimeReports>();
 
             CreateMap<Cases, CaseListDTO>();
             CreateMap<Cases, CaseDetailsDTO>();
