@@ -92,6 +92,10 @@ builder.Services.AddScoped<ICaseAssigneesRepo, CaseAssigneesRepo>();
 builder.Services.AddScoped<ICaseAssigneesService, CaseAssigneesService>();
 builder.Services.AddScoped<ICaseCommentRepo, CaseCommentRepo>();
 builder.Services.AddScoped<ICaseCommentService, CaseCommentService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection("EmailSettings")
+);
 builder.Services.AddAutoMapper(typeof(Mapping));
 
 // ======================
