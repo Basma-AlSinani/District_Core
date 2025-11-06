@@ -3,7 +3,7 @@ using CrimeManagment.Models;
 
 namespace CrimeManagment.Services
 {
-    public interface ICrimeReportsServies
+    public interface ICrimeReportsServie
     {
         Task AddAsync(CrimeReports report);
         Task<CrimeReportDto?> CreateReportAsync(CreateCrimeReportDto dto);

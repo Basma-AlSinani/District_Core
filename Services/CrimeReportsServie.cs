@@ -4,7 +4,7 @@ using CrimeManagementApi.DTOs;
 using Microsoft.EntityFrameworkCore;
 namespace CrimeManagment.Services
 {
-    public class CrimeReportsServies : ICrimeReportsServies
+    public class CrimeReportsServies : ICrimeReportsServie
     {
         private readonly ICrimeReportsRepository _repo;
         public CrimeReportsServies(ICrimeReportsRepository repo)
