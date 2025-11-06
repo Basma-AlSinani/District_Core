@@ -23,8 +23,9 @@ namespace CrimeManagment.Controllers
         {
             if (dto == null)
                 return BadRequest("Invalid case data");
-
-            var newCase = await _caseService.CreateCaseAsync(dto);
+            try
+            {
+                var newCase = await _caseService.CreateCaseAsync(dto);
 
             return Ok(new
             {
@@ -32,12 +33,30 @@ namespace CrimeManagment.Controllers
                 CaseId = newCase.CaseId,
                 CaseNumber = newCase.CaseNumber
             });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Error = ex.Message });
+            }
         }
 
         [HttpPut("updateByID/{id}")]
         public async Task<IActionResult> UpdateCase(int id, [FromBody] UpdateCaseDTO dto)
         {
-            var updatedCase = await _caseService.UpdateCaseAsync(id, dto);
+            var (updatedCase, error) = await _caseService.UpdateCaseAsync(id, dto);
+
+            if (error != null)
+            {
+                if (error.Contains("not found"))
+                    return NotFound(new { Message = error });
+
+                return BadRequest(new { Message = error });
+            }
+
             return Ok(new
             {
                 Message = "Case updated successfully",
@@ -59,6 +78,9 @@ namespace CrimeManagment.Controllers
         {
             {
                 var caseDetails = await _caseService.GetCaseDetailsAsync(id);
+                if (caseDetails == null)
+                    return NotFound(new { Message = $"Case with ID {id} not found" });
+
                 return Ok(caseDetails);
             }
         }
