@@ -56,6 +56,8 @@ namespace CrimeManagment.Models
         [Required]
         public ClearanceLevel ClearanceLevel { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public ICollection<CaseParticipants> CaseParticipants { get; set; } = new List<CaseParticipants>();
+
         public ICollection<CaseComment> CaseComments { get; set; } = new List<CaseComment>();
 
     }
