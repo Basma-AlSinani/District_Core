@@ -40,6 +40,21 @@ namespace CrimeManagementApi.DTOs
         public decimal? Longitude { get; set; }
     }
 
+    public class CreateCrimeReportsDto
+    {
+        [Required, MaxLength(100)]
+        public string Title { get; set; } = string.Empty;
+        [MaxLength(500)]
+        public string? Description { get; set; }
+        [MaxLength(100)]
+        [AllowNull]
+        public string? AreaCity { get; set; }
+        [Range(-90, 90)]
+        public decimal? Latitude { get; set; }
+        [Range(-180, 180)]
+        public decimal? Longitude { get; set; }
+    }
+
     public class UpdateCrimeReportDto
     {
         [MaxLength(100)]

@@ -28,10 +28,10 @@ namespace CrimeManagment.Models
         [Required, MaxLength(200)]
         public string Name { get; set; }
 
-        [MaxLength(1000)]
+        [Required, MaxLength(1000)]
         public string Description { get; set; }
 
-        [MaxLength(100)]
+        [Required, MaxLength(100)]
         public string AreaCity { get; set; }
 
         [MaxLength(50)]
@@ -51,6 +51,7 @@ namespace CrimeManagment.Models
 
         public ICollection<CaseReports> CaseReports { get; set; }
         public ICollection<CaseComment> CaseComments { get; set; } = new List<CaseComment>();
+        public ICollection<CaseParticipants> CaseParticipants { get; set; } = new List<CaseParticipants>();
 
     }
 }

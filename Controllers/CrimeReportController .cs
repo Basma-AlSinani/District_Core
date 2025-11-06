@@ -11,17 +11,17 @@ namespace CrimeManagementApi.Controllers
     [Route("api/[controller]")]
     public class CrimeReportController : ControllerBase
     {
-        private readonly CrimeReportsServies _service;
+        private readonly ICrimeReportsServie _crimeReportsService;
 
-        public CrimeReportController(CrimeReportsServies service)
+        public CrimeReportController(ICrimeReportsServie crimeReportsService)
         {
-            _service = service;
+            _crimeReportsService = crimeReportsService;
         }
 
-        // Public: Citizen report submission (no authentication)
-        [HttpPost("public")]
+        // Public: Citizen report submission 
+        [HttpPost("publicCreateReport")]
         [AllowAnonymous]
-        public async Task<IActionResult> CreateReport([FromBody] CreateCrimeReportDto dto)
+        public async Task<IActionResult> CreateReport([FromBody] CreateCrimeReportsDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -35,10 +35,9 @@ namespace CrimeManagementApi.Controllers
                 Longitude = dto.Longitude ?? 0,
                 CrimeStatus = CrimeStatus.Pending,
                 ReportDataTime = DateTime.UtcNow,
-                UserId = dto.ReportedByUserId ?? 0
             };
 
-            await _service.AddAsync(report);
+            await _crimeReportsService.AddAsync(report);
 
             var resultDto = new CrimeReportDto
             {
@@ -57,7 +56,7 @@ namespace CrimeManagementApi.Controllers
 
         // Authenticated: Logged-in officer/admin can file reports
         [Authorize]
-        [HttpPost]
+        [HttpPost("CreateReport")]
         public async Task<IActionResult> CreateByUser([FromBody] CreateCrimeReportDto dto)
         {
             if (!ModelState.IsValid)
@@ -79,7 +78,7 @@ namespace CrimeManagementApi.Controllers
                 UserId = dto.ReportedByUserId ?? 0
             };
 
-            await _service.AddAsync(report);
+            await _crimeReportsService.AddAsync(report);
 
             var resultDto = new CrimeReportDto
             {
@@ -97,11 +96,11 @@ namespace CrimeManagementApi.Controllers
         }
 
         // Public: Check status by report ID
-        [HttpGet("status/{id}")]
+        [HttpGet("CheckstatusByReportId/{id}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetStatus(int id)
         {
-            var report = await _service.GetByIdAsync(id);
+            var report = await _crimeReportsService.GetByIdAsync(id);
             if (report == null)
                 return NotFound(new { message = $"Report with ID {id} not found." });
 
@@ -109,11 +108,11 @@ namespace CrimeManagementApi.Controllers
         }
 
             // Admin: List all reports
-            [HttpGet]
+        [HttpGet("GetAllReport")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAll()
         {
-            var reports = await _service.GetAllAsync();
+            var reports = await _crimeReportsService.GetAllAsync();
             var reportDtos = reports.Select(r => new CrimeReportDto
             {
                 Id = r.Id,
@@ -130,11 +129,11 @@ namespace CrimeManagementApi.Controllers
         }
 
         // Admin: View single report by ID
-        [HttpGet("{id}")]
+        [HttpGet("GetReportById{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetById(int id)
         {
-            var report = await _service.GetByIdAsync(id);
+            var report = await _crimeReportsService.GetByIdAsync(id);
             if (report == null)
                 return NotFound(new { message = $"Report with ID {id} not found." });
 

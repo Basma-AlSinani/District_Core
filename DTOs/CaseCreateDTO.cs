@@ -31,7 +31,6 @@ namespace CrimeManagment.DTOs
 
         public int? AssignedToUserId { get; set; }
 
-        public AssigneeRole? Role { get; set; }
         public List<int>? AddCrimeReportId { get; set; }
     }
 }
