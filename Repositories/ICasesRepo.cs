@@ -10,5 +10,6 @@ namespace CrimeManagment.Repositories
         Task<Cases> GetCaseDetailsByIdAsync(int id);
         Task<IEnumerable<Evidence>> GetEvidenceByCaseIdAsync(int caseId);
         Task<IEnumerable<CaseParticipants>> GetParticipantsByRoleAsync(int caseId, Role role);
+        Task<List<CaseReports>> GetCaseReportsByCaseIdAsync(int caseId);
     }
 }

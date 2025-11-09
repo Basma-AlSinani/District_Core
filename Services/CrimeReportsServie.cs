@@ -30,7 +30,7 @@ namespace CrimeManagment.Services
                 Longitude = dto.Longitude ?? 0,
                 CrimeStatus = CrimeStatus.Pending,
                 ReportDataTime = DateTime.UtcNow,
-                UserId = dto.ReportedByUserId ?? 0
+                UserId = null
             };
 
             await _repo.AddAsync(entity);

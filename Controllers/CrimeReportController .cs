@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using CrimeManagementApi.DTOs;
-using CrimeManagment.Models;
 using CrimeManagment.Services;
 using System.Security.Claims;
 
@@ -12,147 +11,87 @@ namespace CrimeManagementApi.Controllers
     public class CrimeReportController : ControllerBase
     {
         private readonly ICrimeReportsServie _crimeReportsService;
+        private readonly ILogger<CrimeReportController> _logger;
 
-        public CrimeReportController(ICrimeReportsServie crimeReportsService)
+        public CrimeReportController(ICrimeReportsServie crimeReportsService, ILogger<CrimeReportController> logger)
         {
             _crimeReportsService = crimeReportsService;
+            _logger = logger;
         }
 
-        // Public: Citizen report submission 
-        [HttpPost("publicCreateReport")]
+        [HttpPost("public")]
         [AllowAnonymous]
-        public async Task<IActionResult> CreateReport([FromBody] CreateCrimeReportsDto dto)
+        public async Task<IActionResult> PublicCreateReport([FromBody] CreateCrimeReportsDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var report = new CrimeReports
+            var report = new CrimeManagment.Models.CrimeReports
             {
                 Title = dto.Title,
                 Description = dto.Description,
                 AreaCity = dto.AreaCity ?? string.Empty,
                 Latitude = dto.Latitude ?? 0,
                 Longitude = dto.Longitude ?? 0,
-                CrimeStatus = CrimeStatus.Pending,
+                CrimeStatus = CrimeManagment.Models.CrimeStatus.Pending,
                 ReportDataTime = DateTime.UtcNow,
                 UserId = null
             };
 
             await _crimeReportsService.AddAsync(report);
 
-            var resultDto = new CrimeReportDto
+            return Ok(new
             {
-                Id = report.CrimeReportId,
-                Title = report.Title,
-                Description = report.Description,
-                AreaCity = report.AreaCity,
-                Latitude = report.Latitude,
-                Longitude = report.Longitude,
-                ReportDateTime = report.ReportDataTime,
-                Status = report.CrimeStatus.ToString()
-            };
-
-            return Ok(new { ReportId = resultDto.Id,
-                            Message = "Report submitted successfully." });
+                ReportId = report.CrimeReportId,
+                Message = "Report submitted successfully."
+            });
         }
 
-        // Authenticated: Logged-in officer/admin can file reports
         [Authorize]
-        [HttpPost("CreateReport")]
+        [HttpPost]
         public async Task<IActionResult> CreateByUser([FromBody] CreateCrimeReportDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
-                return Unauthorized(new { message = "Invalid user ID in token." });
-
-            var report = new CrimeReports
+            try
             {
-                Title = dto.Title,
-                Description = dto.Description,
-                AreaCity = dto.AreaCity ?? string.Empty,
-                Latitude = dto.Latitude ?? 0,
-                Longitude = dto.Longitude ?? 0,
-                CrimeStatus = CrimeStatus.Pending,
-                ReportDataTime = DateTime.UtcNow,
-                UserId = dto.ReportedByUserId ?? 0
-            };
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (!string.IsNullOrEmpty(userIdClaim))
+                    dto.ReportedByUserId = int.Parse(userIdClaim);
 
-            await _crimeReportsService.AddAsync(report);
-
-            var resultDto = new CrimeReportDto
+                var reportDto = await _crimeReportsService.CreateReportAsync(dto);
+                return CreatedAtAction(nameof(GetById), new { id = reportDto.Id }, reportDto);
+            }
+            catch (Exception ex)
             {
-                Id = report.CrimeReportId,
-                Title = report.Title,
-                Description = report.Description,
-                AreaCity = report.AreaCity,
-                Latitude = report.Latitude,
-                Longitude = report.Longitude,
-                ReportDateTime = report.ReportDataTime,
-                Status = report.CrimeStatus.ToString()
-            };
-
-            return CreatedAtAction(nameof(GetById), new { id = resultDto.Id }, resultDto);
+                _logger.LogError(ex, "Error creating report with user context.");
+                return StatusCode(500, new { message = "Error creating report with user context." });
+            }
         }
 
-        // Public: Check status by report ID
-        [HttpGet("CheckstatusByReportId/{id}")]
+        [HttpGet("status/{id}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetStatus(int id)
         {
-            var report = await _crimeReportsService.GetByIdAsync(id);
-            if (report == null)
-                return BadRequest(new { message = $"Report with ID {id} not found." });
-
-            return Ok(new { ReportId = report.Id, Status = report.Status });
+            var status = await _crimeReportsService.GetStatusAsync(id);
+            return Ok(new { ReportId = id, Status = status });
         }
 
-            // Admin: List all reports
-        [HttpGet("GetAllReport")]
+        [HttpGet]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAll()
         {
             var reports = await _crimeReportsService.GetAllAsync();
-            var reportDtos = reports.Select(r => new CrimeReportDto
-            {
-                Id = r.Id,
-                Title = r.Title,
-                Description = r.Description,
-                AreaCity = r.AreaCity,
-                Latitude = r.Latitude,
-                Longitude = r.Longitude,
-                ReportDateTime = r.ReportDateTime,
-                Status = r.Status
-            });
-
-            return Ok(reportDtos);
+            return Ok(reports);
         }
 
-        // Admin: View single report by ID
-        [HttpGet("GetReportById{id}")]
+        [HttpGet("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetById(int id)
         {
             var report = await _crimeReportsService.GetByIdAsync(id);
-            if (report == null)
-                return BadRequest(new { message = $"Report with ID {id} not found." });
-
-            var resultDto = new CrimeReportDto
-            {
-                Id = report.Id,
-                Title = report.Title,
-                Description = report.Description,
-                AreaCity = report.AreaCity,
-                Latitude = report.Latitude,
-                Longitude = report.Longitude,
-                ReportDateTime = report.ReportDateTime,
-                Status = report.Status
-            };
-
-            return Ok(resultDto);
+            return report == null ? NotFound(new { Message = $"Report with ID {id} not found." }) : Ok(report);
         }
     }
 }
-

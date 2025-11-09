@@ -63,6 +63,13 @@ namespace CrimeManagment.Repositories
                 .Include(p => p.Participant)
                 .ToListAsync();
         }
+        public async Task<List<CaseReports>> GetCaseReportsByCaseIdAsync(int caseId)
+        {
+            return await _context.CaseReports
+                .Where(cr => cr.CaseId == caseId)
+                .ToListAsync();
+        }
+
     }
 }
 

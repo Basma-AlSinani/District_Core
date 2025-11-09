@@ -88,68 +88,94 @@ namespace CrimeManagment.Services
         // Update an existing case
         public async Task<(Cases? updatedCase, string? error)> UpdateCaseAsync(int caseId, UpdateCaseDTO dto)
         {
-            // Check if Case exists
             var existingCase = await _caseRepository.GetByIdAsync(caseId);
             if (existingCase == null)
                 return (null, "Case not found");
 
-            // Validate Status value
             if (dto.Status.HasValue && !Enum.IsDefined(typeof(ProgreessStatus), dto.Status.Value))
                 return (null, "Invalid Status value");
 
-            // Update fields
             if (!string.IsNullOrEmpty(dto.Description))
                 existingCase.Description = dto.Description;
 
-            // Update Status
             if (dto.Status.HasValue)
-                existingCase.Status = (Status)(int)dto.Status.Value;
+            {
+                existingCase.Status = dto.Status.Value switch
+                {
+                    ProgreessStatus.Pending => Status.Pending,
+                    ProgreessStatus.InProgress => Status.Ongoing,
+                    ProgreessStatus.Completed => Status.Closed,
+                    ProgreessStatus.Closed => Status.Closed,
+                    _ => existingCase.Status
+                };
 
-            // Validate AssignedToUserId if provided
+                if (existingCase.CaseReports == null)
+                    existingCase.CaseReports = await _caseRepository.GetCaseReportsByCaseIdAsync(existingCase.CaseId);
+
+                if (existingCase.CaseReports != null)
+                {
+                    foreach (var caseReport in existingCase.CaseReports)
+                    {
+                        var report = await _crimeReportsRepo.GetByIdAsync(caseReport.CrimeReportId);
+                        if (report != null)
+                            report.CrimeStatus = dto.CrimeStatus.Value;
+                    }
+                }
+            }
+
             if (dto.AssignedToUserId.HasValue)
             {
                 var user = await _userRepository.GetByIdAsync(dto.AssignedToUserId.Value);
                 if (user == null)
                     return (null, $"Assigned user with ID {dto.AssignedToUserId} not found");
 
-                existingCase.CaseReports.Add(new CaseReports
+                if (existingCase.CaseAssignees == null)
+                    existingCase.CaseAssignees = new List<CaseAssignees>();
+
+                existingCase.CaseAssignees.Add(new CaseAssignees
                 {
                     CaseId = existingCase.CaseId,
-                    CrimeReportId = 0, // Placeholder for actual logic
-                    PerformedBy = dto.AssignedToUserId.Value
+                    AssignedToUserId = dto.AssignedToUserId.Value,
+                    AssignedByUserId = existingCase.CreatedByUserId,
+                    Role = AssigneeRole.Investigator,
+                    Status = ProgreessStatus.Pending,
+                    AssignedAt = DateTime.UtcNow
                 });
             }
 
-            // Validate CrimeReportIds exist
             if (dto.AddCrimeReportId != null)
             {
+                if (existingCase.CaseReports == null)
+                    existingCase.CaseReports = await _caseRepository.GetCaseReportsByCaseIdAsync(existingCase.CaseId);
+
+                var existingReportIds = existingCase.CaseReports.Select(cr => cr.CrimeReportId).ToHashSet();
+
                 foreach (var reportId in dto.AddCrimeReportId)
                 {
                     var report = await _crimeReportsRepo.GetByIdAsync(reportId);
                     if (report == null)
                         return (null, $"Crime Report with ID {reportId} not found");
+
+                    if (!existingReportIds.Contains(reportId))
+                    {
+                        existingCase.CaseReports.Add(new CaseReports
+                        {
+                            CaseId = existingCase.CaseId,
+                            CrimeReportId = reportId,
+                            PerformedBy = existingCase.CreatedByUserId
+                        });
+                        existingReportIds.Add(reportId);
+                    }
                 }
             }
 
             await _caseRepository.UpdateAsync(existingCase);
             await _caseRepository.SaveChangesAsync();
 
-            // Insert related crime reports after validation
-            if (dto.AddCrimeReportId != null)
-            {
-                foreach (var reportId in dto.AddCrimeReportId)
-                {
-                    var caseReport = new CaseReports
-                    {
-                        CaseId = existingCase.CaseId,
-                        CrimeReportId = reportId
-                    };
-                    await _caseReportsRepo.AddAsync(caseReport);
-                }
-                await _caseReportsRepo.SaveChangesAsync();
-            }
             return (existingCase, null);
         }
+
+
 
         // Get all cases
         public async Task<IEnumerable<CaseListDTO>> GetCasesAsync()
