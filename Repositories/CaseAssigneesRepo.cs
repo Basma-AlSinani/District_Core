@@ -14,7 +14,7 @@ namespace CrimeManagment.Repositories
         public async Task<IEnumerable<CaseAssignees>> GetAssigneesByCaseIdAsync(int caseId)
         {
             return await _dbSet
-                .Include(ca => ca.Users)
+                .Include(ca => ca.AssignedToUserId)
                 .Where(ca => ca.CaseId == caseId)
                 .ToListAsync();
         }
@@ -24,9 +24,9 @@ namespace CrimeManagment.Repositories
             var assignment = new CaseAssignees
             {
                 CaseId = caseId,
-                UserId = userId,
-                AssigneeRole = role,
-                ProgreessStatus = ProgreessStatus.Pending,
+                AssignedByUserId = userId,
+                Role = role,
+                Status = ProgreessStatus.Pending,
                 AssignedAt = DateTime.UtcNow
             };
 
@@ -38,7 +38,7 @@ namespace CrimeManagment.Repositories
         {
             var assignment = await _dbSet.FindAsync(caseAssigneeId);
             if (assignment == null) return false;
-            assignment.ProgreessStatus = newStatus;
+            assignment.Status = newStatus;
             await _context.SaveChangesAsync();
             return true;
         }

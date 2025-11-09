@@ -43,10 +43,10 @@ namespace CrimeManagment.Repositories
         public async Task<IEnumerable<Users>> GetAssigneesByCaseIdAsync(int caseId)
         {
             return await _context.CaseAssignees
-                .Where(a => a.CaseId == caseId)
-                .Include(a => a.Users)
-                .Select(a => a.Users)
-                .ToListAsync();
+        .Where(a => a.CaseId == caseId)
+        .Include(a => a.AssignedTo)
+        .Select(a => a.AssignedTo)
+        .ToListAsync();
         }
 
         public async Task<IEnumerable<Evidence>> GetEvidenceByCaseIdAsync(int caseId)

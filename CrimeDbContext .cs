@@ -23,14 +23,20 @@ namespace CrimeManagment
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<CaseAssignees>()
-                .HasOne(ca => ca.Users)
+                .HasOne(ca => ca.AssignedBy)
                 .WithMany()
-                .HasForeignKey(ca => ca.UserId)
+                .HasForeignKey(ca => ca.AssignedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CaseAssignees>()
+                .HasOne(ca => ca.AssignedTo)
+                .WithMany()
+                .HasForeignKey(ca => ca.AssignedToUserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<CaseAssignees>()
                 .HasOne(ca => ca.Cases)
-                .WithMany()
+                .WithMany(c => c.CaseAssignees)
                 .HasForeignKey(ca => ca.CaseId)
                 .OnDelete(DeleteBehavior.Cascade);
 
@@ -105,24 +111,16 @@ namespace CrimeManagment
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<CaseComment>()
-            .HasOne(cc => cc.User)
-            .WithMany(u => u.CaseComments)
-            .HasForeignKey(cc => cc.UserId)
-            .OnDelete(DeleteBehavior.Restrict);
+                .HasOne(cc => cc.User)
+                .WithMany(u => u.CaseComments)
+                .HasForeignKey(cc => cc.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<CaseComment>()
                 .HasOne(cc => cc.Case)
                 .WithMany(c => c.CaseComments)
                 .HasForeignKey(cc => cc.CaseId)
                 .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<CaseAssignees>()
-            .HasOne(ca => ca.AssignedBy)
-             .WithMany()
-             .HasForeignKey(ca => ca.AssignedByUserId)
-             .OnDelete(DeleteBehavior.Restrict);
-
-
         }
     }
 }

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CrimeManagment.Migrations
 {
     [DbContext(typeof(CrimeDbContext))]
-    [Migration("20251105053735_initaial")]
-    partial class initaial
+    [Migration("20251109082512_UpdateCaseAssigneesRelations")]
+    partial class UpdateCaseAssigneesRelations
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -39,25 +39,25 @@ namespace CrimeManagment.Migrations
                     b.Property<int>("AssignedByUserId")
                         .HasColumnType("int");
 
-                    b.Property<int>("AssigneeRole")
+                    b.Property<int>("AssignedToUserId")
                         .HasColumnType("int");
 
                     b.Property<int>("CaseId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ProgreessStatus")
+                    b.Property<int>("Role")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
+                    b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.HasKey("CaseAssigneeId");
 
                     b.HasIndex("AssignedByUserId");
 
-                    b.HasIndex("CaseId");
+                    b.HasIndex("AssignedToUserId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("CaseId");
 
                     b.ToTable("CaseAssignees");
                 });
@@ -110,6 +110,9 @@ namespace CrimeManagment.Migrations
                     b.Property<int>("CaseId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("CasesCaseId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");
 
@@ -119,13 +122,20 @@ namespace CrimeManagment.Migrations
                     b.Property<int>("Role")
                         .HasColumnType("int");
 
+                    b.Property<int?>("UsersUserId")
+                        .HasColumnType("int");
+
                     b.HasKey("CaseParticipantId");
 
                     b.HasIndex("AddedByUserId");
 
                     b.HasIndex("CaseId");
 
+                    b.HasIndex("CasesCaseId");
+
                     b.HasIndex("ParticipantId");
+
+                    b.HasIndex("UsersUserId");
 
                     b.ToTable("CaseParticipants");
                 });
@@ -147,6 +157,9 @@ namespace CrimeManagment.Migrations
                     b.Property<int>("CrimeReportId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("CrimeReportsCrimeReportId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("LinkedAt")
                         .HasColumnType("datetime2");
 
@@ -162,6 +175,8 @@ namespace CrimeManagment.Migrations
                     b.HasIndex("CasesCaseId");
 
                     b.HasIndex("CrimeReportId");
+
+                    b.HasIndex("CrimeReportsCrimeReportId");
 
                     b.HasIndex("PerformedBy");
 
@@ -240,8 +255,8 @@ namespace CrimeManagment.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<decimal>("Latitude")
                         .HasColumnType("decimal(18,2)");
@@ -444,23 +459,23 @@ namespace CrimeManagment.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("CrimeManagment.Models.Cases", "Cases")
+                    b.HasOne("CrimeManagment.Models.Users", "AssignedTo")
                         .WithMany()
+                        .HasForeignKey("AssignedToUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CrimeManagment.Models.Cases", "Cases")
+                        .WithMany("CaseAssignees")
                         .HasForeignKey("CaseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CrimeManagment.Models.Users", "Users")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.Navigation("AssignedBy");
 
-                    b.Navigation("Cases");
+                    b.Navigation("AssignedTo");
 
-                    b.Navigation("Users");
+                    b.Navigation("Cases");
                 });
 
             modelBuilder.Entity("CrimeManagment.Models.CaseComment", b =>
@@ -495,11 +510,19 @@ namespace CrimeManagment.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("CrimeManagment.Models.Cases", null)
+                        .WithMany("CaseParticipants")
+                        .HasForeignKey("CasesCaseId");
+
                     b.HasOne("CrimeManagment.Models.Participants", "Participant")
                         .WithMany()
                         .HasForeignKey("ParticipantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("CrimeManagment.Models.Users", null)
+                        .WithMany("CaseParticipants")
+                        .HasForeignKey("UsersUserId");
 
                     b.Navigation("AddedByUser");
 
@@ -525,6 +548,10 @@ namespace CrimeManagment.Migrations
                         .HasForeignKey("CrimeReportId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("CrimeManagment.Models.CrimeReports", null)
+                        .WithMany("CaseReports")
+                        .HasForeignKey("CrimeReportsCrimeReportId");
 
                     b.HasOne("CrimeManagment.Models.Users", "Users")
                         .WithMany()
@@ -599,14 +626,25 @@ namespace CrimeManagment.Migrations
 
             modelBuilder.Entity("CrimeManagment.Models.Cases", b =>
                 {
+                    b.Navigation("CaseAssignees");
+
                     b.Navigation("CaseComments");
 
+                    b.Navigation("CaseParticipants");
+
+                    b.Navigation("CaseReports");
+                });
+
+            modelBuilder.Entity("CrimeManagment.Models.CrimeReports", b =>
+                {
                     b.Navigation("CaseReports");
                 });
 
             modelBuilder.Entity("CrimeManagment.Models.Users", b =>
                 {
                     b.Navigation("CaseComments");
+
+                    b.Navigation("CaseParticipants");
                 });
 #pragma warning restore 612, 618
         }

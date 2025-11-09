@@ -36,25 +36,25 @@ namespace CrimeManagment.Migrations
                     b.Property<int>("AssignedByUserId")
                         .HasColumnType("int");
 
-                    b.Property<int>("AssigneeRole")
+                    b.Property<int>("AssignedToUserId")
                         .HasColumnType("int");
 
                     b.Property<int>("CaseId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ProgreessStatus")
+                    b.Property<int>("Role")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
+                    b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.HasKey("CaseAssigneeId");
 
                     b.HasIndex("AssignedByUserId");
 
-                    b.HasIndex("CaseId");
+                    b.HasIndex("AssignedToUserId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("CaseId");
 
                     b.ToTable("CaseAssignees");
                 });
@@ -456,23 +456,23 @@ namespace CrimeManagment.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("CrimeManagment.Models.Cases", "Cases")
+                    b.HasOne("CrimeManagment.Models.Users", "AssignedTo")
                         .WithMany()
+                        .HasForeignKey("AssignedToUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CrimeManagment.Models.Cases", "Cases")
+                        .WithMany("CaseAssignees")
                         .HasForeignKey("CaseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CrimeManagment.Models.Users", "Users")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.Navigation("AssignedBy");
 
-                    b.Navigation("Cases");
+                    b.Navigation("AssignedTo");
 
-                    b.Navigation("Users");
+                    b.Navigation("Cases");
                 });
 
             modelBuilder.Entity("CrimeManagment.Models.CaseComment", b =>
@@ -622,6 +622,8 @@ namespace CrimeManagment.Migrations
 
             modelBuilder.Entity("CrimeManagment.Models.Cases", b =>
                 {
+                    b.Navigation("CaseAssignees");
+
                     b.Navigation("CaseComments");
 
                     b.Navigation("CaseParticipants");
