@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace CrimeManagment.Migrations
 {
     /// <inheritdoc />
-    public partial class initaial : Migration
+    public partial class UpdateCaseAssigneesRelations : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -82,7 +82,7 @@ namespace CrimeManagment.Migrations
                     CrimeReportId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     AreaCity = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ReportDataTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CrimeStatus = table.Column<int>(type: "int", nullable: false),
@@ -107,11 +107,11 @@ namespace CrimeManagment.Migrations
                 {
                     CaseAssigneeId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    AssigneeRole = table.Column<int>(type: "int", nullable: false),
-                    ProgreessStatus = table.Column<int>(type: "int", nullable: false),
+                    Role = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
                     AssignedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CaseId = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false),
+                    AssignedToUserId = table.Column<int>(type: "int", nullable: false),
                     AssignedByUserId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -130,8 +130,8 @@ namespace CrimeManagment.Migrations
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_CaseAssignees_Users_UserId",
-                        column: x => x.UserId,
+                        name: "FK_CaseAssignees_Users_AssignedToUserId",
+                        column: x => x.AssignedToUserId,
                         principalTable: "Users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Restrict);
@@ -176,7 +176,9 @@ namespace CrimeManagment.Migrations
                     Role = table.Column<int>(type: "int", nullable: false),
                     Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AddedByUserId = table.Column<int>(type: "int", nullable: true),
-                    AssignedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    AssignedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CasesCaseId = table.Column<int>(type: "int", nullable: true),
+                    UsersUserId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -187,6 +189,11 @@ namespace CrimeManagment.Migrations
                         principalTable: "Cases",
                         principalColumn: "CaseId",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CaseParticipants_Cases_CasesCaseId",
+                        column: x => x.CasesCaseId,
+                        principalTable: "Cases",
+                        principalColumn: "CaseId");
                     table.ForeignKey(
                         name: "FK_CaseParticipants_Participants_ParticipantId",
                         column: x => x.ParticipantId,
@@ -199,6 +206,11 @@ namespace CrimeManagment.Migrations
                         principalTable: "Users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_CaseParticipants_Users_UsersUserId",
+                        column: x => x.UsersUserId,
+                        principalTable: "Users",
+                        principalColumn: "UserId");
                 });
 
             migrationBuilder.CreateTable(
@@ -247,7 +259,8 @@ namespace CrimeManagment.Migrations
                     CrimeReportId = table.Column<int>(type: "int", nullable: false),
                     PerformedBy = table.Column<int>(type: "int", nullable: true),
                     Notes = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    CasesCaseId = table.Column<int>(type: "int", nullable: true)
+                    CasesCaseId = table.Column<int>(type: "int", nullable: true),
+                    CrimeReportsCrimeReportId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -269,6 +282,11 @@ namespace CrimeManagment.Migrations
                         principalTable: "CrimeReports",
                         principalColumn: "CrimeReportId",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CaseReports_CrimeReports_CrimeReportsCrimeReportId",
+                        column: x => x.CrimeReportsCrimeReportId,
+                        principalTable: "CrimeReports",
+                        principalColumn: "CrimeReportId");
                     table.ForeignKey(
                         name: "FK_CaseReports_Users_PerformedBy",
                         column: x => x.PerformedBy,
@@ -312,14 +330,14 @@ namespace CrimeManagment.Migrations
                 column: "AssignedByUserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CaseAssignees_AssignedToUserId",
+                table: "CaseAssignees",
+                column: "AssignedToUserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CaseAssignees_CaseId",
                 table: "CaseAssignees",
                 column: "CaseId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CaseAssignees_UserId",
-                table: "CaseAssignees",
-                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CaseComments_CaseId",
@@ -342,9 +360,19 @@ namespace CrimeManagment.Migrations
                 column: "CaseId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CaseParticipants_CasesCaseId",
+                table: "CaseParticipants",
+                column: "CasesCaseId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CaseParticipants_ParticipantId",
                 table: "CaseParticipants",
                 column: "ParticipantId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CaseParticipants_UsersUserId",
+                table: "CaseParticipants",
+                column: "UsersUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CaseReports_CaseId_CrimeReportId",
@@ -361,6 +389,11 @@ namespace CrimeManagment.Migrations
                 name: "IX_CaseReports_CrimeReportId",
                 table: "CaseReports",
                 column: "CrimeReportId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CaseReports_CrimeReportsCrimeReportId",
+                table: "CaseReports",
+                column: "CrimeReportsCrimeReportId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CaseReports_PerformedBy",

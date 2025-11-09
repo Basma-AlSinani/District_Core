@@ -23,10 +23,10 @@ namespace CrimeManagment.Models
         public int CaseAssigneeId { get; set; }
 
         [Required]
-        public AssigneeRole AssigneeRole { get; set; }
+        public AssigneeRole Role { get; set; }
 
         [Required]
-        public ProgreessStatus ProgreessStatus { get; set; }
+        public ProgreessStatus Status { get; set; }
 
         public DateTime AssignedAt { get; set; }= DateTime.UtcNow;
 
@@ -34,9 +34,9 @@ namespace CrimeManagment.Models
         public int CaseId { get; set; }
         public Cases Cases { get; set; }
 
-        [ForeignKey("Users")]
-        public int UserId { get; set; }
-        public Users Users { get; set; }
+        [ForeignKey("AssignedTo")]
+        public int AssignedToUserId { get; set; }
+        public Users AssignedTo { get; set; }
 
         [ForeignKey("AssignedBy")]
         public int AssignedByUserId { get; set; }
