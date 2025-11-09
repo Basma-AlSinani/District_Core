@@ -32,26 +32,28 @@ namespace CrimeManagementApi.DTOs
         [MaxLength(100)]
         [AllowNull]
         public string? AreaCity { get; set; }
-        [AllowNull]
         public int? ReportedByUserId { get; set; }
         [Range(-90, 90)]
         public decimal? Latitude { get; set; }
         [Range(-180, 180)]
         public decimal? Longitude { get; set; }
+
     }
 
     public class CreateCrimeReportsDto
     {
-        [Required, MaxLength(100)]
+        [Required(ErrorMessage = "Title is required.")]
+        [MaxLength(100, ErrorMessage = "Title cannot exceed 100 characters.")]
         public string Title { get; set; } = string.Empty;
-        [MaxLength(500)]
+        [Required(ErrorMessage = "Description is required.")]
+        [MaxLength(500, ErrorMessage = "Description cannot exceed 500 characters.")]
         public string? Description { get; set; }
-        [MaxLength(100)]
-        [AllowNull]
+        [Required(ErrorMessage = "AreaCity is required.")]
+        [MaxLength(100, ErrorMessage = "AreaCity cannot exceed 100 characters.")]
         public string? AreaCity { get; set; }
-        [Range(-90, 90)]
+        [Range(-90, 90, ErrorMessage = "Latitude must be between -90 and 90.")]
         public decimal? Latitude { get; set; }
-        [Range(-180, 180)]
+        [Range(-180, 180, ErrorMessage = "Longitude must be between -180 and 180.")]
         public decimal? Longitude { get; set; }
     }
 

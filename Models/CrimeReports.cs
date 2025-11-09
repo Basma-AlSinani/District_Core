@@ -30,8 +30,8 @@ namespace CrimeManagment.Models
         public decimal Latitude { get; set; }
         public decimal Longitude { get; set; }
         [ForeignKey("Users")]
-        public int UserId { get; set; }
-        public Users Users { get; set; }
+        public int? UserId { get; set; }
+        public Users? Users { get; set; }
         // Navigation property for related CaseReports
         public ICollection<CaseReports> CaseReports { get; set; } = new List<CaseReports>();
     }

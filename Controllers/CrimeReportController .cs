@@ -35,6 +35,7 @@ namespace CrimeManagementApi.Controllers
                 Longitude = dto.Longitude ?? 0,
                 CrimeStatus = CrimeStatus.Pending,
                 ReportDataTime = DateTime.UtcNow,
+                UserId = null
             };
 
             await _crimeReportsService.AddAsync(report);
@@ -51,7 +52,8 @@ namespace CrimeManagementApi.Controllers
                 Status = report.CrimeStatus.ToString()
             };
 
-            return Ok(new { ReportId = resultDto.Id, Message = "Report submitted successfully." });
+            return Ok(new { ReportId = resultDto.Id,
+                            Message = "Report submitted successfully." });
         }
 
         // Authenticated: Logged-in officer/admin can file reports
@@ -63,8 +65,8 @@ namespace CrimeManagementApi.Controllers
                 return BadRequest(ModelState);
 
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (!string.IsNullOrEmpty(userIdClaim))
-                dto.ReportedByUserId = int.Parse(userIdClaim);
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+                return Unauthorized(new { message = "Invalid user ID in token." });
 
             var report = new CrimeReports
             {
@@ -102,7 +104,7 @@ namespace CrimeManagementApi.Controllers
         {
             var report = await _crimeReportsService.GetByIdAsync(id);
             if (report == null)
-                return NotFound(new { message = $"Report with ID {id} not found." });
+                return BadRequest(new { message = $"Report with ID {id} not found." });
 
             return Ok(new { ReportId = report.Id, Status = report.Status });
         }
@@ -135,7 +137,7 @@ namespace CrimeManagementApi.Controllers
         {
             var report = await _crimeReportsService.GetByIdAsync(id);
             if (report == null)
-                return NotFound(new { message = $"Report with ID {id} not found." });
+                return BadRequest(new { message = $"Report with ID {id} not found." });
 
             var resultDto = new CrimeReportDto
             {
