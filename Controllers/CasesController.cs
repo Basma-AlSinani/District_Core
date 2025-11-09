@@ -94,52 +94,6 @@ namespace CrimeManagment.Controllers
 
             return Ok(new { Message = "Case deleted successfully" });
         }
-
-
-        // get All Assignees by ID
-        [HttpGet("GetAllAssignees/{caseId}")]
-        public async Task<IActionResult> GetAllAssignees(int caseId)
-        {
-            var result = await _caseService.GetAssigneesByCaseIdAsync(caseId);
-            if (!result.Any()) return NotFound(new { message = "No assignees found for this case." });
-            return Ok(result);
-        }
-
-        // get All Evidence by ID
-        [HttpGet("GetAllEvidence/{caseId}")]
-        public async Task<IActionResult> GetAllEvidence(int caseId)
-        {
-            var result = await _caseService.GetEvidenceByCaseIdAsync(caseId);
-            if (!result.Any()) return NotFound(new { message = "No evidences found for this case." });
-            return Ok(result);
-        }
-
-        // get All Suspects by ID
-        [HttpGet("GetAllSuspects/{caseId}")]
-        public async Task<IActionResult> GetAllSuspects(int caseId)
-        {
-            var result = await _caseService.GetParticipantsByRoleAsync(caseId, Role.Suspect);
-            if (!result.Any()) return NotFound(new { message = "No suspects found for this case." });
-            return Ok(result);
-        }
-
-        // get All Victims by ID
-        [HttpGet("GetAllVictims/{caseId}")]
-        public async Task<IActionResult> GetAllVictims(int caseId)
-        {
-            var result = await _caseService.GetParticipantsByRoleAsync(caseId, Role.Victim);
-            if (!result.Any()) return NotFound(new { message = "No victims found for this case." });
-            return Ok(result);
-        }
-
-        // get All Witnesses by ID
-        [HttpGet("GetAllWitnesses/{caseId}")]
-        public async Task<IActionResult> GetAllWitnesses(int caseId)
-        {
-            var result = await _caseService.GetParticipantsByRoleAsync(caseId, Role.Witness);
-            if (!result.Any()) return NotFound(new { message = "No witnesses found for this case." });
-            return Ok(result);
-        }
     }
 }
 

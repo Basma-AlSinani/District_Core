@@ -31,37 +31,11 @@ namespace CrimeManagment.Repositories
         public async Task<Cases> GetCaseDetailsByIdAsync(int id)
         {
             return await _context.Cases
-                .Include(c => c.CaseParticipants)
-                    .ThenInclude(cp => cp.Participant)
                 .Include(c => c.CaseReports)
                     .ThenInclude(cr => cr.CrimeReports)
                 .Include(c => c.CreatedByUser)
                 .FirstOrDefaultAsync(c => c.CaseId == id);
 
-        }
-
-        public async Task<IEnumerable<Users>> GetAssigneesByCaseIdAsync(int caseId)
-        {
-            return await _context.CaseAssignees
-        .Where(a => a.CaseId == caseId)
-        .Include(a => a.AssignedTo)
-        .Select(a => a.AssignedTo)
-        .ToListAsync();
-        }
-
-        public async Task<IEnumerable<Evidence>> GetEvidenceByCaseIdAsync(int caseId)
-        {
-            return await _context.Evidences
-                .Where(e => e.CaseId == caseId && !e.IsSoftDeleted)
-                .ToListAsync();
-        }
-
-        public async Task<IEnumerable<CaseParticipants>> GetParticipantsByRoleAsync(int caseId, Role role)
-        {
-            return await _context.CaseParticipants
-                .Where(p => p.CaseId == caseId && p.Role == role)
-                .Include(p => p.Participant)
-                .ToListAsync();
         }
         public async Task<List<CaseReports>> GetCaseReportsByCaseIdAsync(int caseId)
         {
