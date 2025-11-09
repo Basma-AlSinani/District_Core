@@ -12,10 +12,5 @@
         public string CreatedBy { get; set; }
         public DateTime CreatedAt { get; set; }
         public string ReportedBy { get; set; } // User who reported the case
-        public int NumberOfAssignees { get; set; }
-        public int NumberOfEvidences { get; set; }
-        public int NumberOfSuspects { get; set; }
-        public int NumberOfVictims { get; set; }
-        public int NumberOfWitnesses { get; set; }
     }
 }
