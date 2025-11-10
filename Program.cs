@@ -124,6 +124,20 @@ builder.Services.AddAuthentication(options =>
 
     options.Events = new JwtBearerEvents
     {
+        OnChallenge = context =>
+        {
+            // Prevents the default 401 response
+            context.HandleResponse();
+            context.Response.StatusCode = 401;
+            context.Response.ContentType = "application/json";
+
+            var result = System.Text.Json.JsonSerializer.Serialize(new
+            {
+                Message = "You are not authorized. Please log in first."
+            });
+
+            return context.Response.WriteAsync(result);
+        },
         OnForbidden = context =>
         {
             context.Response.StatusCode = 403;
