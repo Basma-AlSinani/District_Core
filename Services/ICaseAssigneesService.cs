@@ -3,7 +3,7 @@
 public interface ICaseAssigneesService
 {
     Task AddAsync(CaseAssignees entity);
-    Task<bool> AssignUserToCaseAsync(int caseId, int assignerId, int assigneeId, AssigneeRole role);
+    Task<(bool Success, string Message)> AssignUserToCaseAsync(int caseId, int assignerId, int assigneeId, AssigneeRole role);
     Task DeleteAsync(int id);
     Task<IEnumerable<CaseAssignees>> GetAllAsync();
     Task<IEnumerable<CaseAssignees>> GetAssigneesByCaseIdAsync(int caseId);

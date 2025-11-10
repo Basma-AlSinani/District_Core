@@ -1,6 +1,5 @@
 ﻿using CrimeManagment.Models;
 using Microsoft.EntityFrameworkCore;
-
 namespace CrimeManagment.Repositories
 {
     public class CaseAssigneesRepo : GenericRepository<CaseAssignees>, ICaseAssigneesRepo
@@ -10,15 +9,17 @@ namespace CrimeManagment.Repositories
         {
             _context = context;
         }
-
+        //  Get all assignees for a specific case (with full navigation loading)
         public async Task<IEnumerable<CaseAssignees>> GetAssigneesByCaseIdAsync(int caseId)
         {
-            return await _dbSet
-                .Include(ca => ca.AssignedToUserId)
+            return await _context.CaseAssignees
+                .Include(ca => ca.Cases)
+                .Include(ca => ca.AssignedTo)
+                .Include(ca => ca.AssignedBy)
                 .Where(ca => ca.CaseId == caseId)
                 .ToListAsync();
         }
-
+        //  Assign a user to a case (creates a new record)
         public async Task<bool> AssignUserToCaseAsync(int caseId, int userId, AssigneeRole role)
         {
             var assignment = new CaseAssignees
@@ -29,25 +30,27 @@ namespace CrimeManagment.Repositories
                 Status = ProgreessStatus.Pending,
                 AssignedAt = DateTime.UtcNow
             };
-
-            await AddAsync(assignment);
-            return true;
-        }
-
-        public async Task<bool> UpdateAssigneeStatusAsync(int caseAssigneeId, ProgreessStatus newStatus)
-        {
-            var assignment = await _dbSet.FindAsync(caseAssigneeId);
-            if (assignment == null) return false;
-            assignment.Status = newStatus;
+            await _context.CaseAssignees.AddAsync(assignment);
             await _context.SaveChangesAsync();
             return true;
         }
-
-        public async Task<Users> GetUserByIdAsync(int id)
+        //  Update the status of an existing assignee
+        public async Task<bool> UpdateAssigneeStatusAsync(int caseAssigneeId, ProgreessStatus newStatus)
+        {
+            var assignment = await _context.CaseAssignees.FindAsync(caseAssigneeId);
+            if (assignment == null)
+                return false;
+            assignment.Status = newStatus;
+            _context.CaseAssignees.Update(assignment);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        //  Fetch user by ID (used for validation)
+        public async Task<Users?> GetUserByIdAsync(int id)
         {
             return await _context.Users.FindAsync(id);
         }
-
+        //  Get case authorization level for permission checks
         public async Task<int> GetCaseAuthorizationLevel(int caseId)
         {
             var c = await _context.Cases.FindAsync(caseId);

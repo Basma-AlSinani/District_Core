@@ -20,14 +20,13 @@ namespace CrimeManagment.Controllers
         }
 
        
-
         [HttpPost("assign")]
         public async Task<IActionResult> Assign([FromBody] AssignUserDTO dto)
         {
             // dto must include AssignerId, AssigneeId, Role
             var result = await _service.AssignUserToCaseAsync(dto.CaseId, dto.AssignerId, dto.AssigneeId, dto.Role);
 
-            if (!result)
+            if (result)
                 return BadRequest(new { message = "Assignment failed. Check assigner/assignee roles, case existence, and clearance level." });
 
             return CreatedAtAction(nameof(GetByCase), new { caseId = dto.CaseId }, dto);
