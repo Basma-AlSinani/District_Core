@@ -56,9 +56,9 @@ namespace CrimeManagementApi.Controllers
         }
 
 
-        
+
         [HttpPost("user/submit-report")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
 
         public async Task<IActionResult> CreateByUser([FromBody] CreateCrimeReportDto dto)
         {
@@ -84,7 +84,7 @@ namespace CrimeManagementApi.Controllers
             }
         }
         [HttpGet("Get/All/Crime/Report")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAll()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -96,7 +96,7 @@ namespace CrimeManagementApi.Controllers
         }
 
         [HttpGet("Get/Crime/Report/By{id}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetById(int id)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
