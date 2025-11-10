@@ -9,7 +9,6 @@ namespace CrimeManagment.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "Admin,Investigator")]
     public class CaseAssigneesController : ControllerBase
     {
         private readonly ICaseAssigneesService _service;
@@ -19,20 +18,21 @@ namespace CrimeManagment.Controllers
             _service = service;
         }
 
-       
         [HttpPost("assign")]
+        [Authorize(Roles = "Admin,Investigator")]
         public async Task<IActionResult> Assign([FromBody] AssignUserDTO dto)
         {
-            // dto must include AssignerId, AssigneeId, Role
-            var result = await _service.AssignUserToCaseAsync(dto.CaseId, dto.AssignerId, dto.AssigneeId, dto.Role);
+            var (success, message) = await _service.AssignUserToCaseAsync(dto.CaseId, dto.AssignerId, dto.AssigneeId, dto.Role);
 
-            if (result)
-                return BadRequest(new { message = "Assignment failed. Check assigner/assignee roles, case existence, and clearance level." });
+            if (!success)
+                return BadRequest(new { message });
 
-            return CreatedAtAction(nameof(GetByCase), new { caseId = dto.CaseId }, dto);
+            return CreatedAtAction(nameof(GetByCase), new { caseId = dto.CaseId }, new { message });
         }
 
+
         [HttpGet("case/{caseId}")]
+        [Authorize(Roles = "Admin,Investigator")]
         public async Task<IActionResult> GetByCase(int caseId)
         {
             var list = await _service.GetAssigneesByCaseIdAsync(caseId);
