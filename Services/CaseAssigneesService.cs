@@ -6,22 +6,30 @@ namespace CrimeManagment.Services
     public class CaseAssigneesService : ICaseAssigneesService
     {
         private readonly ICaseAssigneesRepo _caseAssigneesRepo;
+        private readonly IUsersRepo _userRepo ;
+        private readonly ICasesRepo _caseRepo;
 
-        public CaseAssigneesService(ICaseAssigneesRepo caseAssigneesRepo)
+
+
+
+        public CaseAssigneesService(ICaseAssigneesRepo caseAssigneesRepo, IUsersRepo userRepo, ICasesRepo caseRepo)
         {
             _caseAssigneesRepo = caseAssigneesRepo;
+            _userRepo = userRepo;
+            _caseRepo = caseRepo;
         }
 
         private int RoleRank(UserRole role)
         {
             return role switch
             {
-                UserRole.Admin => 4,
-                UserRole.Investigator => 3,
-                UserRole.Officer => 2,
+                UserRole.Officer => 1,
+                UserRole.Investigator => 2,
+                UserRole.Admin => 3,
                 _ => 0
             };
         }
+
 
         public async Task<IEnumerable<CaseAssignees>> GetAssigneesByCaseIdAsync(int caseId)
         {
@@ -30,17 +38,35 @@ namespace CrimeManagment.Services
 
         public async Task<bool> AssignUserToCaseAsync(int caseId, int assignerId, int assigneeId, AssigneeRole role)
         {
-            var assigner = await _caseAssigneesRepo.GetUserByIdAsync(assignerId);
-            var assignee = await _caseAssigneesRepo.GetUserByIdAsync(assigneeId);
-            if (assigner == null || assignee == null) return false;
+            var assigner = await _userRepo.GetByIdAsync(assignerId);
+            var assignee = await _userRepo.GetByIdAsync(assigneeId);
+            var targetCase = await _caseRepo.GetByIdAsync(caseId);
 
-            if (RoleRank(assigner.Role) <= RoleRank(assignee.Role)) return false;
-
-            if (role == AssigneeRole.Officer && (int)assignee.ClearanceLevel < await _caseAssigneesRepo.GetCaseAuthorizationLevel(caseId))
+            if (assigner == null || assignee == null || targetCase == null)
                 return false;
 
-            return await _caseAssigneesRepo.AssignUserToCaseAsync(caseId, assigneeId, role);
+            
+            if (RoleRank(assigner.Role) <= RoleRank(assignee.Role))
+                return false;
+
+            
+            if ((int)assignee.ClearanceLevel < (int)targetCase.AuthorizationLevel)
+                return false;
+
+            
+            var newAssignment = new CaseAssignees
+            {
+                CaseId = caseId,
+                CaseAssigneeId = assigneeId,
+                Role = role
+            };
+
+            await _caseAssigneesRepo.AddAsync(newAssignment);
+            await _caseAssigneesRepo.SaveChangesAsync();
+
+            return true;
         }
+
 
         public async Task<bool> UpdateAssigneeStatusAsync(int caseAssigneeId, ProgreessStatus newStatus)
         {
