@@ -19,14 +19,7 @@ namespace CrimeManagment.Controllers
             _service = service;
         }
 
-        [HttpGet("case/{caseId}")]
-        public async Task<IActionResult> GetByCase(int caseId)
-        {
-            var list = await _service.GetAssigneesByCaseIdAsync(caseId);
-            if (!list.Any())
-                return NotFound(new { message = "No assignees found for this case." });
-            return Ok(list);
-        }
+       
 
         [HttpPost("assign")]
         public async Task<IActionResult> Assign([FromBody] AssignUserDTO dto)
@@ -38,6 +31,15 @@ namespace CrimeManagment.Controllers
                 return BadRequest(new { message = "Assignment failed. Check assigner/assignee roles, case existence, and clearance level." });
 
             return CreatedAtAction(nameof(GetByCase), new { caseId = dto.CaseId }, dto);
+        }
+
+        [HttpGet("case/{caseId}")]
+        public async Task<IActionResult> GetByCase(int caseId)
+        {
+            var list = await _service.GetAssigneesByCaseIdAsync(caseId);
+            if (!list.Any())
+                return NotFound(new { message = "No assignees found for this case." });
+            return Ok(list);
         }
 
         [HttpPut("{id}/progress")]

@@ -6,11 +6,9 @@ namespace CrimeManagment.Models
     public enum CrimeStatus
     {
         Pending,
-        En_route,
-        On_scene,
-        Under_investigation,
-        Resolved,
-        Reported
+        InProgress,
+        Completed,
+        Closed
     }
     public class CrimeReports
     {
