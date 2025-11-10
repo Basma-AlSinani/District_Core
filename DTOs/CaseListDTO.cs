@@ -4,6 +4,7 @@ namespace CrimeManagment.DTOs
 {
     public class CaseListDTO
     {
+        public string CaseId { get; set; }
         public string CaseNumber { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }

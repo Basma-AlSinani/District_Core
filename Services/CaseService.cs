@@ -184,6 +184,7 @@ namespace CrimeManagment.Services
 
             var result = cases.Select(c => new CaseListDTO
             {
+                CaseId = c.CaseId.ToString(),
                 CaseNumber = c.CaseNumber,
                 Name = c.Name,
                 Description = c.Description,
