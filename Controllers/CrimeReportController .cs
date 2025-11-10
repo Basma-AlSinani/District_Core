@@ -18,8 +18,8 @@ namespace CrimeManagementApi.Controllers
             _crimeReportsService = crimeReportsService;
             _logger = logger;
         }
-
-        [HttpPost("public")]
+        //For public users to create crime reports
+        [HttpPost("public/submit-report")]
         [AllowAnonymous]
         public async Task<IActionResult> PublicCreateReport([FromBody] CreateCrimeReportsDto dto)
         {
@@ -47,8 +47,19 @@ namespace CrimeManagementApi.Controllers
             });
         }
 
+        [HttpGet("status/{id}public")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetStatus(int id)
+        {
+            var status = await _crimeReportsService.GetStatusAsync(id);
+            return Ok(new { ReportId = id, Status = status });
+        }
+
+
+        
+        [HttpPost("user/submit-report")]
         [Authorize]
-        [HttpPost]
+
         public async Task<IActionResult> CreateByUser([FromBody] CreateCrimeReportDto dto)
         {
             if (!ModelState.IsValid)
@@ -57,8 +68,11 @@ namespace CrimeManagementApi.Controllers
             try
             {
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (!string.IsNullOrEmpty(userIdClaim))
-                    dto.ReportedByUserId = int.Parse(userIdClaim);
+                if (string.IsNullOrEmpty(userIdClaim))
+                    return Unauthorized(new { Message = "You are not authorized to submit a report." });
+
+                dto.ReportedByUserId = int.Parse(userIdClaim);
+
 
                 var reportDto = await _crimeReportsService.CreateReportAsync(dto);
                 return CreatedAtAction(nameof(GetById), new { id = reportDto.Id }, reportDto);
@@ -69,27 +83,26 @@ namespace CrimeManagementApi.Controllers
                 return StatusCode(500, new { message = "Error creating report with user context." });
             }
         }
-
-        [HttpGet("status/{id}")]
-        [AllowAnonymous]
-        public async Task<IActionResult> GetStatus(int id)
-        {
-            var status = await _crimeReportsService.GetStatusAsync(id);
-            return Ok(new { ReportId = id, Status = status });
-        }
-
-        [HttpGet]
-        [Authorize(Roles = "Admin")]
+        [HttpGet("Get/All/Crime/Report")]
+        [Authorize]
         public async Task<IActionResult> GetAll()
         {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim))
+                return Unauthorized(new { Message = "You are not authorized to view reports." });
+
             var reports = await _crimeReportsService.GetAllAsync();
             return Ok(reports);
         }
 
-        [HttpGet("{id}")]
-        [Authorize(Roles = "Admin")]
+        [HttpGet("Get/Crime/Report/By{id}")]
+        [Authorize]
         public async Task<IActionResult> GetById(int id)
         {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim))
+                return Unauthorized(new { Message = "You are not authorized to view reports." });
+
             var report = await _crimeReportsService.GetByIdAsync(id);
             return report == null ? NotFound(new { Message = $"Report with ID {id} not found." }) : Ok(report);
         }
