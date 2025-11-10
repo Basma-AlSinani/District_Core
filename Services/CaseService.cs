@@ -9,14 +9,12 @@ namespace CrimeManagment.Services
     {
         private readonly ICasesRepo _caseRepository;
         private readonly IGenericRepository<CrimeReports> _crimeReportsRepo;
-        private readonly IGenericRepository<CaseReports> _caseReportsRepo;
         private readonly IGenericRepository<Users> _userRepository;
 
-        public CaseService(ICasesRepo caseRepository, IGenericRepository<CrimeReports> crimeReportsRepo, IGenericRepository<CaseReports> caseReportsRepo, IGenericRepository<Users> userRepository)
+        public CaseService(ICasesRepo caseRepository, IGenericRepository<CrimeReports> crimeReportsRepo, IGenericRepository<Users> userRepository)
         {
             _caseRepository = caseRepository;
             _crimeReportsRepo = crimeReportsRepo;
-            _caseReportsRepo = caseReportsRepo;
             _userRepository = userRepository;
         }
 
@@ -63,25 +61,6 @@ namespace CrimeManagment.Services
             await _caseRepository.AddAsync(newCase);
             await _caseRepository.SaveChangesAsync();
 
-            // Link crime reports to the new case
-            if (dto.CrimeReportIds != null && dto.CrimeReportIds.Any())
-            {
-                foreach (var reportId in dto.CrimeReportIds)
-                {
-                    var report = await _crimeReportsRepo.GetByIdAsync(reportId);
-                    if (report == null)
-                        throw new ArgumentException($"Crime report with ID {reportId} does not exist.");
-
-                    var caseReport = new CaseReports
-                    {
-                        CaseId = newCase.CaseId,
-                        CrimeReportId = report.CrimeReportId,
-                        PerformedBy = currentUserId
-                    };
-                    await _caseReportsRepo.AddAsync(caseReport);
-                }
-                await _caseReportsRepo.SaveChangesAsync();
-            }
             return newCase;
         }
 
@@ -108,21 +87,7 @@ namespace CrimeManagment.Services
                     ProgreessStatus.Closed => Status.Closed,
                     _ => existingCase.Status
                 };
-
-                if (existingCase.CaseReports == null)
-                    existingCase.CaseReports = await _caseRepository.GetCaseReportsByCaseIdAsync(existingCase.CaseId);
-
-                if (existingCase.CaseReports != null)
-                {
-                    foreach (var caseReport in existingCase.CaseReports)
-                    {
-                        var report = await _crimeReportsRepo.GetByIdAsync(caseReport.CrimeReportId);
-                        if (report != null)
-                            report.CrimeStatus = dto.CrimeStatus.Value;
-                    }
-                }
             }
-
             if (dto.AssignedToUserId.HasValue)
             {
                 var user = await _userRepository.GetByIdAsync(dto.AssignedToUserId.Value);
@@ -141,32 +106,6 @@ namespace CrimeManagment.Services
                     Status = ProgreessStatus.Pending,
                     AssignedAt = DateTime.UtcNow
                 });
-            }
-
-            if (dto.AddCrimeReportId != null)
-            {
-                if (existingCase.CaseReports == null)
-                    existingCase.CaseReports = await _caseRepository.GetCaseReportsByCaseIdAsync(existingCase.CaseId);
-
-                var existingReportIds = existingCase.CaseReports.Select(cr => cr.CrimeReportId).ToHashSet();
-
-                foreach (var reportId in dto.AddCrimeReportId)
-                {
-                    var report = await _crimeReportsRepo.GetByIdAsync(reportId);
-                    if (report == null)
-                        return (null, $"Crime Report with ID {reportId} not found");
-
-                    if (!existingReportIds.Contains(reportId))
-                    {
-                        existingCase.CaseReports.Add(new CaseReports
-                        {
-                            CaseId = existingCase.CaseId,
-                            CrimeReportId = reportId,
-                            PerformedBy = existingCase.CreatedByUserId
-                        });
-                        existingReportIds.Add(reportId);
-                    }
-                }
             }
 
             await _caseRepository.UpdateAsync(existingCase);
@@ -204,10 +143,6 @@ namespace CrimeManagment.Services
             if (caseEntity == null)
                 return null;
 
-            var firstReport = caseEntity.CaseReports?
-                .FirstOrDefault()?
-                .CrimeReports;
-
             return new CaseDetailsDTO
             {
                 CaseNumber = caseEntity.CaseNumber,
@@ -219,7 +154,7 @@ namespace CrimeManagment.Services
                 AuthorizationLevel = caseEntity.AuthorizationLevel.ToString(),
                 CreatedBy = $"{caseEntity.CreatedByUser.FirstName} {caseEntity.CreatedByUser.LastName}",
                 CreatedAt = caseEntity.CreatedAt,
-                ReportedBy = firstReport != null ? $"{firstReport.Users.FirstName} {firstReport.Users.LastName}" : "N/A",
+                ReportedBy = "N/A",
             };
         }
 
@@ -229,17 +164,6 @@ namespace CrimeManagment.Services
             var existingCase = await _caseRepository.GetByIdAsync(caseId);
             if (existingCase == null)
                 return false;
-
-            // Delete related CaseReports to avoid foreign key constraint issues
-            var relatedReports = await _caseReportsRepo
-                .GetAllAsync();
-
-            // Delete the case
-            var toRemove = relatedReports.Where(r => r.CaseId == caseId).ToList();
-            foreach (var item in toRemove)
-            {
-                await _caseReportsRepo.DeleteAsync(item);
-            }
 
             // delete casas
             await _caseRepository.DeleteAsync(existingCase);

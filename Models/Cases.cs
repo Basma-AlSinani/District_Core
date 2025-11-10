@@ -49,7 +49,6 @@ namespace CrimeManagment.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-        public ICollection<CaseReports> CaseReports { get; set; }
         public ICollection<CaseComment> CaseComments { get; set; } = new List<CaseComment>();
         public ICollection<CaseAssignees> CaseAssignees { get; set; } = new List<CaseAssignees>();
 

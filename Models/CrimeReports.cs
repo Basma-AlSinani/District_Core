@@ -31,6 +31,6 @@ namespace CrimeManagment.Models
         public int? UserId { get; set; }
         public Users? Users { get; set; }
         // Navigation property for related CaseReports
-        public ICollection<CaseReports> CaseReports { get; set; } = new List<CaseReports>();
+        public ICollection<Cases> CaseReports { get; set; } = new List<Cases>();
     }
 }

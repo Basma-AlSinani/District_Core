@@ -86,8 +86,6 @@ builder.Services.AddScoped<IEvidenceAuditLogsRepo, EvidenceAuditLogsRepo>();
 builder.Services.AddScoped<IEvidenceAuditLogsService, EvidenceAuditLogsService>();
 builder.Services.AddScoped<ICrimeReportsRepository, CrimeReportsRepo>();
 builder.Services.AddScoped<ICrimeReportsServie, CrimeReportsServies>();
-builder.Services.AddScoped<ICaseReportRepo, CaseReportRepo>();
-builder.Services.AddScoped<ICaseReportService, CaseReportService>();
 builder.Services.AddScoped<ICaseAssigneesRepo, CaseAssigneesRepo>();
 builder.Services.AddScoped<ICaseAssigneesService, CaseAssigneesService>();
 builder.Services.AddScoped<ICaseCommentRepo, CaseCommentRepo>();

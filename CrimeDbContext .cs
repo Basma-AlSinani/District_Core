@@ -8,7 +8,6 @@ namespace CrimeManagment
         public CrimeDbContext(DbContextOptions<CrimeDbContext> options) : base(options) { }
 
         public DbSet<Cases> Cases { get; set; }
-        public DbSet<CaseReports> CaseReports { get; set; }
         public DbSet<CaseAssignees> CaseAssignees { get; set; }
         public DbSet<CaseParticipants> CaseParticipants { get; set; }
         public DbSet<Users> Users { get; set; }
@@ -62,28 +61,6 @@ namespace CrimeManagment
                 .HasOne(cr => cr.Users)
                 .WithMany()
                 .HasForeignKey(cr => cr.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<CaseReports>()
-                .HasIndex(cr => new { cr.CaseId, cr.CrimeReportId })
-                .IsUnique();
-
-            modelBuilder.Entity<CaseReports>()
-                .HasOne(cr => cr.cases)
-                .WithMany()
-                .HasForeignKey(cr => cr.CaseId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<CaseReports>()
-                .HasOne(cr => cr.CrimeReports)
-                .WithMany()
-                .HasForeignKey(cr => cr.CrimeReportId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<CaseReports>()
-                .HasOne(cr => cr.Users)
-                .WithMany()
-                .HasForeignKey(cr => cr.PerformedBy)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Evidence>()

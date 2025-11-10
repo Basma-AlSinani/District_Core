@@ -31,19 +31,10 @@ namespace CrimeManagment.Repositories
         public async Task<Cases> GetCaseDetailsByIdAsync(int id)
         {
             return await _context.Cases
-                .Include(c => c.CaseReports)
-                    .ThenInclude(cr => cr.CrimeReports)
                 .Include(c => c.CreatedByUser)
                 .FirstOrDefaultAsync(c => c.CaseId == id);
 
         }
-        public async Task<List<CaseReports>> GetCaseReportsByCaseIdAsync(int caseId)
-        {
-            return await _context.CaseReports
-                .Where(cr => cr.CaseId == caseId)
-                .ToListAsync();
-        }
-
     }
 }
 
