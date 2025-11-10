@@ -21,7 +21,7 @@ namespace CrimeManagment.Services
         }
 
         // Create a new case
-        public async Task<Cases> CreateCaseAsync(CaseCreateDTO dto)
+        public async Task<Cases> CreateCaseAsync(CaseCreateDTO dto, int currentUserId, UserRole currentUserRole)
         {
             // Validate required fields
             if (string.IsNullOrWhiteSpace(dto.Name))
@@ -30,15 +30,14 @@ namespace CrimeManagment.Services
                 throw new ArgumentException("Description is required.");
             if (string.IsNullOrWhiteSpace(dto.AreaCity))
                 throw new ArgumentException("AreaCity is required.");
-            if (!Enum.IsDefined(typeof(Status), dto.Status))
-                throw new ArgumentException($"Invalid Status value. Allowed values: {string.Join(", ", Enum.GetNames(typeof(Status)))}");
-            if (!Enum.IsDefined(typeof(AuthorizationLevel), dto.AuthorizationLevel))
-                throw new ArgumentException($"Invalid AuthorizationLevel value. Allowed values: {string.Join(", ", Enum.GetNames(typeof(AuthorizationLevel)))}");
 
-            // Validate CreatedByUserId exists
-            var user = await _userRepository.GetByIdAsync(dto.CreatedByUserId);
-            if (user == null)
-                throw new ArgumentException($"User with ID {dto.CreatedByUserId} does not exist.");
+            AuthorizationLevel level = currentUserRole switch
+            {
+                UserRole.Admin => AuthorizationLevel.Critical,
+                UserRole.Investigator => AuthorizationLevel.High,
+                UserRole.Officer => AuthorizationLevel.Medium,
+                _ => AuthorizationLevel.Low
+            };
 
             // Generate a unique case number
             string uniqueCaseNumber = $"CASE-{DateTime.UtcNow:yyyyMMddHHmmss}";
@@ -55,9 +54,9 @@ namespace CrimeManagment.Services
                 Description = dto.Description,
                 AreaCity = dto.AreaCity,
                 CaseType = dto.CaseType,
-                AuthorizationLevel = dto.AuthorizationLevel,
+                AuthorizationLevel = level,
                 Status = Status.Pending,
-                CreatedByUserId = dto.CreatedByUserId,
+                CreatedByUserId = currentUserId,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -65,23 +64,24 @@ namespace CrimeManagment.Services
             await _caseRepository.SaveChangesAsync();
 
             // Link crime reports to the new case
-            foreach (var reportId in dto.CrimeReportIds)
+            if (dto.CrimeReportIds != null && dto.CrimeReportIds.Any())
             {
-                var report = await _crimeReportsRepo.GetByIdAsync(reportId);
-                if (report == null)
-                    throw new ArgumentException($"Crime report with ID {reportId} does not exist.");
-
-                var caseReport = new CaseReports
+                foreach (var reportId in dto.CrimeReportIds)
                 {
-                    CaseId = newCase.CaseId,
-                    CrimeReportId = report.CrimeReportId,
-                    PerformedBy = dto.CreatedByUserId
-                };
-                await _caseReportsRepo.AddAsync(caseReport);
+                    var report = await _crimeReportsRepo.GetByIdAsync(reportId);
+                    if (report == null)
+                        throw new ArgumentException($"Crime report with ID {reportId} does not exist.");
 
+                    var caseReport = new CaseReports
+                    {
+                        CaseId = newCase.CaseId,
+                        CrimeReportId = report.CrimeReportId,
+                        PerformedBy = currentUserId
+                    };
+                    await _caseReportsRepo.AddAsync(caseReport);
+                }
+                await _caseReportsRepo.SaveChangesAsync();
             }
-            await _caseReportsRepo.SaveChangesAsync();
-
             return newCase;
         }
 

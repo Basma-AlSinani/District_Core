@@ -5,7 +5,7 @@ namespace CrimeManagment.Services
 {
     public interface ICaseService
     {
-        Task<Cases> CreateCaseAsync(CaseCreateDTO dto);
+        Task<Cases> CreateCaseAsync(CaseCreateDTO dto, int currentUserId, UserRole currentUserRole);
         Task<bool> DeleteCaseAsync(int caseId);
         Task<CaseDetailsDTO> GetCaseDetailsAsync(int id);
         Task<IEnumerable<CaseListDTO>> GetCasesAsync();

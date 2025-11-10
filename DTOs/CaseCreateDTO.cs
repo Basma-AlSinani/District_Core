@@ -16,10 +16,6 @@ namespace CrimeManagment.DTOs
 
         public Status Status { get; set; } 
 
-        public AuthorizationLevel AuthorizationLevel { get; set; }
-
-        public int CreatedByUserId { get; set; }
-
         public List<int> CrimeReportIds { get; set; } = new();
     }
 

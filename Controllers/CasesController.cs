@@ -2,7 +2,9 @@
 using CrimeManagment.Models;
 using CrimeManagment.Repositories;
 using CrimeManagment.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace CrimeManagment.Controllers
 {
@@ -19,15 +21,27 @@ namespace CrimeManagment.Controllers
         }
 
         [HttpPost("CreateNewCase")]
+        [Authorize]
         public async Task<IActionResult> CreateCase([FromBody] CaseCreateDTO dto)
         {
             if (dto == null)
                 return BadRequest("Invalid case data");
             try
             {
-                var newCase = await _caseService.CreateCaseAsync(dto);
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userIdClaim))
+                    return Unauthorized(new { Message = "User ID not found in token." });
 
-            return Ok(new
+                int currentUserId = int.Parse(userIdClaim);
+
+                var roleClaim = User.FindFirst(ClaimTypes.Role)?.Value;
+                if (string.IsNullOrEmpty(roleClaim))
+                    return Unauthorized(new { Message = "User role not found in token." });
+
+                Enum.TryParse(roleClaim, out UserRole currentUserRole);
+
+                var newCase = await _caseService.CreateCaseAsync(dto, currentUserId, currentUserRole);
+                return Ok(new
             {
                 Message = "Case created successfully",
                 CaseId = newCase.CaseId,
