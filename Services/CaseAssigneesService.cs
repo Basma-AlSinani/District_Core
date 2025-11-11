@@ -1,14 +1,18 @@
 ﻿using CrimeManagment.Models;
 using CrimeManagment.Repositories;
-using Microsoft.Extensions.Options;
+
+using static CrimeManagment.DTOs.CaseAssigneesDTOs;
 
 namespace CrimeManagment.Services
 {
     public class CaseAssigneesService : ICaseAssigneesService
     {
         private readonly ICaseAssigneesRepo _caseAssigneesRepo;
-        private readonly IUsersRepo _userRepo ;
+        private readonly IUsersRepo _userRepo;
         private readonly ICasesRepo _caseRepo;
+
+
+
 
         public CaseAssigneesService(ICaseAssigneesRepo caseAssigneesRepo, IUsersRepo userRepo, ICasesRepo caseRepo)
         {
@@ -29,10 +33,25 @@ namespace CrimeManagment.Services
         }
 
 
-        public async Task<IEnumerable<CaseAssignees>> GetAssigneesByCaseIdAsync(int caseId)
+        public async Task<IEnumerable<CaseAssigneeDTOs>> GetAssigneesByCaseIdAsync(int caseId)
         {
-            return await _caseAssigneesRepo.GetAssigneesByCaseIdAsync(caseId);
+            var assignees = await _caseAssigneesRepo.GetAssigneesByCaseIdAsync(caseId);
+
+            return assignees.Select(a => new CaseAssigneeDTOs
+            {
+                CaseAssigneeId = a.CaseAssigneeId,
+                CaseId = a.CaseId,
+                Role = a.Role.ToString(),
+                Status = a.Status.ToString(),
+                AssignedAt = a.AssignedAt,
+                AssignedToName = a.AssignedTo?.FullName,
+                AssignedToRole = a.AssignedTo?.Role.ToString(),
+                AssignedByName = a.AssignedBy?.FullName,
+                CaseNumber = a.Cases?.CaseNumber,
+                CaseName = a.Cases?.Name
+            });
         }
+
 
         public async Task<(bool Success, string Message)> AssignUserToCaseAsync(int caseId, int assignerId, int assigneeId, AssigneeRole role)
         {
@@ -42,18 +61,16 @@ namespace CrimeManagment.Services
 
             if (assigner == null)
                 return (false, $"Assigner with ID {assignerId} not found.");
-
-            if (RoleRank(assigner.Role) <= RoleRank(assignee.Role))
+            if (assignee == null)
                 return (false, $"Assignee with ID {assigneeId} not found.");
-
             if (targetCase == null)
                 return (false, $"Case with ID {caseId} not found.");
+
             if (RoleRank(assigner.Role) <= RoleRank(assignee.Role))
                 return (false, $"Cannot assign. {assigner.Role} cannot assign a {assignee.Role}.");
 
             if ((int)assignee.ClearanceLevel < (int)targetCase.AuthorizationLevel)
                 return (false, $"Assignee's clearance level is too low for this case.");
-
 
             // Optional: prevent duplicates
             var existing = (await _caseAssigneesRepo.GetAssigneesByCaseIdAsync(caseId))
@@ -64,7 +81,8 @@ namespace CrimeManagment.Services
             var newAssignment = new CaseAssignees
             {
                 CaseId = caseId,
-                CaseAssigneeId = assigneeId,
+                AssignedByUserId = assignerId,
+                AssignedToUserId = assigneeId,
                 Role = role,
                 Status = ProgreessStatus.Pending,
                 AssignedAt = DateTime.UtcNow
@@ -75,6 +93,8 @@ namespace CrimeManagment.Services
 
             return (true, "Assignment successful.");
         }
+
+
 
 
         public async Task<bool> UpdateAssigneeStatusAsync(int caseAssigneeId, ProgreessStatus newStatus)

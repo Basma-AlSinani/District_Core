@@ -5,8 +5,9 @@ namespace CrimeManagment.Models
 {
     public enum AssigneeRole
     {
-        Investigator,
-        Officer
+        Officer = 1,
+        Investigator = 2,
+        Admin = 3
     }
 
     public enum ProgreessStatus

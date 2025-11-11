@@ -29,15 +29,15 @@ namespace CrimeManagment.Services
                 throw new Exception("A user with this email already exists.");
 
             // Validate Clearance Level Restrictions based on Role
-            if (user.Role == UserRole.Investigator && user.ClearanceLevel > ClearanceLevel.High)
-            {
-                throw new Exception("Investigator cannot have a Clearance Level higher than High (2).");
-            }
+            //if (user.Role == UserRole.Investigator && user.ClearanceLevel > ClearanceLevel.High)
+            //{
+            //    throw new Exception("Investigator cannot have a Clearance Level higher than High (2).");
+            //}
 
-            if (user.Role == UserRole.Officer && user.ClearanceLevel != ClearanceLevel.Low)
-            {
-                throw new Exception("Officer can only have Clearance Level Low (0).");
-            }
+            //if (user.Role == UserRole.Officer && user.ClearanceLevel != ClearanceLevel.Low)
+            //{
+            //    throw new Exception("Officer can only have Clearance Level Low (0).");
+            //}
             await _userRepository.AddAsync(user);
             await _userRepository.SaveChangesAsync();
             return user;

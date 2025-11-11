@@ -1,13 +1,17 @@
-﻿using CrimeManagment.Models;
+﻿using CrimeManagment.DTOs;
+using CrimeManagment.Models;
 
-public interface ICaseAssigneesService
+namespace CrimeManagment.Services
 {
-    Task AddAsync(CaseAssignees entity);
-    Task<(bool Success, string Message)> AssignUserToCaseAsync(int caseId, int assignerId, int assigneeId, AssigneeRole role);
-    Task DeleteAsync(int id);
-    Task<IEnumerable<CaseAssignees>> GetAllAsync();
-    Task<IEnumerable<CaseAssignees>> GetAssigneesByCaseIdAsync(int caseId);
-    Task<CaseAssignees> GetByIdAsync(int id);
-    Task<bool> UpdateAssigneeStatusAsync(int caseAssigneeId, ProgreessStatus newStatus);
-    Task UpdateAsync(CaseAssignees entity);
+    public interface ICaseAssigneesService
+    {
+        Task AddAsync(CaseAssignees entity);
+        Task<(bool Success, string Message)> AssignUserToCaseAsync(int caseId, int assignerId, int assigneeId, AssigneeRole role);
+        Task DeleteAsync(int id);
+        Task<IEnumerable<CaseAssignees>> GetAllAsync();
+        Task<IEnumerable<CaseAssigneesDTOs.CaseAssigneeDTOs>> GetAssigneesByCaseIdAsync(int caseId);
+        Task<CaseAssignees> GetByIdAsync(int id);
+        Task<bool> UpdateAssigneeStatusAsync(int caseAssigneeId, ProgreessStatus newStatus);
+        Task UpdateAsync(CaseAssignees entity);
+    }
 }

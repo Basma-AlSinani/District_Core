@@ -4,6 +4,8 @@ using CrimeManagment.Models;
 using CrimeManagment.Services;
 using CrimeManagment.DTOs;
 using static CrimeManagment.DTOs.CaseAssigneesDTOs;
+using System.Security.Claims;
+using CrimeManagment.Repositories;
 
 namespace CrimeManagment.Controllers
 {
@@ -12,23 +14,36 @@ namespace CrimeManagment.Controllers
     public class CaseAssigneesController : ControllerBase
     {
         private readonly ICaseAssigneesService _service;
+        private readonly IUsersRepo _usersRepo;
 
-        public CaseAssigneesController(ICaseAssigneesService service)
+        public CaseAssigneesController(ICaseAssigneesService service, IUsersRepo usersRepo)
         {
             _service = service;
+            _usersRepo = usersRepo;
         }
 
         [HttpPost("assign")]
         [Authorize(Roles = "Admin,Investigator")]
         public async Task<IActionResult> Assign([FromBody] AssignUserDTO dto)
         {
-            var (success, message) = await _service.AssignUserToCaseAsync(dto.CaseId, dto.AssignerId, dto.AssigneeId, dto.Role);
+            int assignerId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
-            if (!success)
-                return BadRequest(new { message });
+            var assignee = await _usersRepo.GetByIdAsync(dto.AssigneeId);
+            if (assignee == null)
+                return NotFound(new { message = "Assignee not found." });
 
-            return CreatedAtAction(nameof(GetByCase), new { caseId = dto.CaseId }, new { message });
+            var role = MapUserRoleToAssigneeRole(assignee.Role);
+
+            var result = await _service.AssignUserToCaseAsync(dto.CaseId, assignerId, dto.AssigneeId, role);
+
+            if (!result.Success)
+                return BadRequest(new { message = result.Message });
+
+            return CreatedAtAction(nameof(GetByCase), new { caseId = dto.CaseId }, new { message = result.Message });
         }
+
+
+
 
 
         [HttpGet("case/{caseId}")]
@@ -63,5 +78,16 @@ namespace CrimeManagment.Controllers
             await _service.DeleteAsync(id);
             return Ok(new { message = "Assignee removed successfully." });
         }
+        private AssigneeRole MapUserRoleToAssigneeRole(UserRole userRole)
+        {
+            return userRole switch
+            {
+                UserRole.Officer => AssigneeRole.Officer,
+                UserRole.Investigator => AssigneeRole.Investigator,
+                UserRole.Admin => AssigneeRole.Admin,
+                _ => AssigneeRole.Officer
+            };
+        }
+
     }
 }
