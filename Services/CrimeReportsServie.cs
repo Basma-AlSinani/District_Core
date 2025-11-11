@@ -4,22 +4,19 @@ using CrimeManagementApi.DTOs;
 using Microsoft.EntityFrameworkCore;
 namespace CrimeManagment.Services
 {
-    public class CrimeReportsServies : ICrimeReportsServie
+    public class CrimeReportsService : ICrimeReportsService
     {
         private readonly ICrimeReportsRepository _repo;
-        public CrimeReportsServies(ICrimeReportsRepository repo)
+        private readonly IEmailService _emailService;
+
+        public CrimeReportsService(ICrimeReportsRepository repo, IEmailService emailService)
         {
             _repo = repo;
-        }
-
-        // Add a new CrimeReports entity
-        public async Task AddAsync(CrimeReports report)
-        {
-            await _repo.AddAsync(report);
+            _emailService = emailService;
         }
 
         // Create a new report
-        public async Task<CrimeReportDto?> CreateReportAsync(CreateCrimeReportDto dto)
+        public async Task<CrimeReportDto?> CreateReportAsync(CreateCrimeReportDto dto, int? reportedByUserId = null)
         {
             var entity = new CrimeReports
             {
@@ -28,12 +25,24 @@ namespace CrimeManagment.Services
                 AreaCity = dto.AreaCity ?? string.Empty,
                 Latitude = dto.Latitude ?? 0,
                 Longitude = dto.Longitude ?? 0,
+                Email = dto.Email,
+                UserId = reportedByUserId,
                 CrimeStatus = CrimeStatus.Pending,
                 ReportDataTime = DateTime.UtcNow,
-                UserId = null
+               
             };
 
             await _repo.AddAsync(entity);
+
+
+            string subject = $"New Crime Reported in {entity.AreaCity}";
+            string body = $"A new crime has been reported in {entity.AreaCity}.<br>" +
+                          $"<strong>Title:</strong> {entity.Title}<br>" +
+                          $"<strong>Description:</strong> {entity.Description}<br>" +
+                          $"<strong>Date:</strong> {entity.ReportDataTime}";
+
+            await _emailService.SendEmailAsync(entity.Email, subject, body);
+
 
             return new CrimeReportDto
             {
@@ -47,6 +56,7 @@ namespace CrimeManagment.Services
                 ReportDateTime = entity.ReportDataTime
             };
         }
+
 
         // Get all reports
         public async Task<IEnumerable<CrimeReportDto>> GetAllAsync()

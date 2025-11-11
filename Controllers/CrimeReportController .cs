@@ -10,10 +10,10 @@ namespace CrimeManagementApi.Controllers
     [Route("api/[controller]")]
     public class CrimeReportController : ControllerBase
     {
-        private readonly ICrimeReportsServie _crimeReportsService;
+        private readonly ICrimeReportsService _crimeReportsService;
         private readonly ILogger<CrimeReportController> _logger;
 
-        public CrimeReportController(ICrimeReportsServie crimeReportsService, ILogger<CrimeReportController> logger)
+        public CrimeReportController(ICrimeReportsService crimeReportsService, ILogger<CrimeReportController> logger)
         {
             _crimeReportsService = crimeReportsService;
             _logger = logger;
@@ -21,31 +21,22 @@ namespace CrimeManagementApi.Controllers
         //For public users to create crime reports
         [HttpPost("public/submit-report")]
         [AllowAnonymous]
-        public async Task<IActionResult> PublicCreateReport([FromBody] CreateCrimeReportsDto dto)
+        public async Task<IActionResult> PublicCreateReport([FromBody] CreateCrimeReportDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var report = new CrimeManagment.Models.CrimeReports
-            {
-                Title = dto.Title,
-                Description = dto.Description,
-                AreaCity = dto.AreaCity ?? string.Empty,
-                Latitude = dto.Latitude ?? 0,
-                Longitude = dto.Longitude ?? 0,
-                CrimeStatus = CrimeManagment.Models.CrimeStatus.Pending,
-                ReportDataTime = DateTime.UtcNow,
-                UserId = null
-            };
-
-            await _crimeReportsService.AddAsync(report);
+           
+            var reportDto = await _crimeReportsService.CreateReportAsync(dto);
 
             return Ok(new
             {
-                ReportId = report.CrimeReportId,
-                Message = "Report submitted successfully."
+                ReportId = reportDto.Id,
+                Message = "Report submitted successfully. An email notification has been sent."
             });
         }
+
+
 
         [HttpGet("status/{id}public")]
         [AllowAnonymous]
@@ -59,8 +50,7 @@ namespace CrimeManagementApi.Controllers
 
         [HttpPost("user/submit-report")]
         [Authorize(Roles = "Admin")]
-
-        public async Task<IActionResult> CreateByUser([FromBody] CreateCrimeReportDto dto)
+        public async Task<IActionResult> CreateReportByUser([FromBody] CreateCrimeReportByUserDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -72,10 +62,22 @@ namespace CrimeManagementApi.Controllers
                     return Unauthorized(new { Message = "You are not authorized to submit a report." });
 
                 dto.ReportedByUserId = int.Parse(userIdClaim);
-
-
-                var reportDto = await _crimeReportsService.CreateReportAsync(dto);
-                return CreatedAtAction(nameof(GetById), new { id = reportDto.Id }, reportDto);
+                var reportDto = await _crimeReportsService.CreateReportAsync(
+                    new CreateCrimeReportDto
+                    {
+                        Title = dto.Title,
+                        Description = dto.Description,
+                        AreaCity = dto.AreaCity,
+                        Latitude = dto.Latitude,
+                        Longitude = dto.Longitude
+                    },
+                    dto.ReportedByUserId
+                );
+                return Ok(new
+                {
+                    ReportId = reportDto.Id,
+                    Message = "Report submitted successfully."
+                });
             }
             catch (Exception ex)
             {
@@ -83,6 +85,7 @@ namespace CrimeManagementApi.Controllers
                 return StatusCode(500, new { message = "Error creating report with user context." });
             }
         }
+
         [HttpGet("Get/All/Crime/Report")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAll()

@@ -34,6 +34,8 @@ namespace CrimeManagment.Models
         [ForeignKey("Case")]
         public int? CaseId { get; set; }
         public Cases? Case { get; set; }
+        public string? Email { get; set; }
+
         public ICollection<Evidence> Evidences { get; set; } = new List<Evidence>();
         public ICollection<CaseParticipants> CaseParticipants { get; set; } = new List<CaseParticipants>();
 

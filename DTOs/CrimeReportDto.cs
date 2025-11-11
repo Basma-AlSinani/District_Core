@@ -27,14 +27,20 @@ namespace CrimeManagementApi.DTOs
     {
         [Required, MaxLength(100)]
         public string Title { get; set; } = string.Empty;
+
         [MaxLength(500)]
         public string? Description { get; set; }
+
         [MaxLength(100)]
-        [AllowNull]
         public string? AreaCity { get; set; }
-        public int? ReportedByUserId { get; set; }
+
+        [EmailAddress(ErrorMessage = "Invalid email address.")]
+        [Required(ErrorMessage = "Email is required.")]
+        public string Email { get; set; } = string.Empty;
+
         [Range(-90, 90)]
         public decimal? Latitude { get; set; }
+
         [Range(-180, 180)]
         public decimal? Longitude { get; set; }
 
@@ -72,5 +78,24 @@ namespace CrimeManagementApi.DTOs
         [Range(-180, 180)]
         public decimal? Longitude { get; set; }
     }
+    public class CreateCrimeReportByUserDto
+    {
+        [Required, MaxLength(100)]
+        public string Title { get; set; } = string.Empty;
+
+        [MaxLength(500)]
+        public string? Description { get; set; }
+
+        [MaxLength(100)]
+        public string? AreaCity { get; set; }
+
+        public int ReportedByUserId { get; set; } 
+        [Range(-90, 90)]
+        public decimal? Latitude { get; set; }
+
+        [Range(-180, 180)]
+        public decimal? Longitude { get; set; }
+    }
+
 }
 

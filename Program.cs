@@ -87,7 +87,7 @@ builder.Services.AddScoped<ICaseParticipantService, CaseParticipantService>();
 builder.Services.AddScoped<IEvidenceAuditLogsRepo, EvidenceAuditLogsRepo>();
 builder.Services.AddScoped<IEvidenceAuditLogsService, EvidenceAuditLogsService>();
 builder.Services.AddScoped<ICrimeReportsRepository, CrimeReportsRepo>();
-builder.Services.AddScoped<ICrimeReportsServie, CrimeReportsServies>();
+builder.Services.AddScoped<ICrimeReportsService, CrimeReportsService>();
 builder.Services.AddScoped<ICaseAssigneesRepo, CaseAssigneesRepo>();
 builder.Services.AddScoped<ICaseAssigneesService, CaseAssigneesService>();
 builder.Services.AddScoped<ICaseCommentRepo, CaseCommentRepo>();
