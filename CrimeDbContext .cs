@@ -98,6 +98,13 @@ namespace CrimeManagment
                 .WithMany(c => c.CaseComments)
                 .HasForeignKey(cc => cc.CaseId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CrimeReports>()
+            .HasOne(cr => cr.Case)
+            .WithMany(c => c.CrimeReports)
+         .HasForeignKey(cr => cr.CaseId)
+         .OnDelete(DeleteBehavior.Restrict);
+
         }
     }
 }

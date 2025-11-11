@@ -30,7 +30,12 @@ namespace CrimeManagment.Models
         [ForeignKey("Users")]
         public int? UserId { get; set; }
         public Users? Users { get; set; }
-        // Navigation property for related CaseReports
-        public ICollection<Cases> CaseReports { get; set; } = new List<Cases>();
+
+        [ForeignKey("Case")]
+        public int? CaseId { get; set; }
+        public Cases? Case { get; set; }
+        public ICollection<Evidence> Evidences { get; set; } = new List<Evidence>();
+        public ICollection<CaseParticipants> CaseParticipants { get; set; } = new List<CaseParticipants>();
+
     }
 }

@@ -51,6 +51,8 @@ namespace CrimeManagment.Models
 
         public ICollection<CaseComment> CaseComments { get; set; } = new List<CaseComment>();
         public ICollection<CaseAssignees> CaseAssignees { get; set; } = new List<CaseAssignees>();
+        public ICollection<CrimeReports> CrimeReports { get; set; } = new List<CrimeReports>();
+
 
     }
 }
