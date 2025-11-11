@@ -171,7 +171,7 @@ namespace CrimeManagment.Controllers
                     return NotFound(new { message = $"Evidence with ID {id} not found." });
 
                 if (request.Confirm.ToLower() != "yes")
-                    return Ok(new { message = "Deletion canceled by user." });
+                    return Ok(new { message = "Please confirm the deletion by typing 'yes'." });
 
                 await _evidenceService.HardDeleteAsync(id);
                 return Ok(new { message = $"Evidence ID {id} permanently deleted and logged for audit." });

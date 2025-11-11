@@ -10,10 +10,13 @@ namespace CrimeManagment.Services
     {
         private readonly IEvidenceRepo _evidenceRepo;
         private readonly IUsersRepo _userRepo;
-        public EvidenceService(IEvidenceRepo evidenceRepo,IUsersRepo usersRepo)
+        private readonly ICasesRepo _casesRepo;
+
+        public EvidenceService(IEvidenceRepo evidenceRepo,IUsersRepo usersRepo, ICasesRepo casesRepo)
         {
             _evidenceRepo = evidenceRepo;
             _userRepo = usersRepo;
+            _casesRepo = casesRepo;
         }
 
         public async Task<IEnumerable<Evidence>> GetAllAsync()
@@ -67,6 +70,14 @@ namespace CrimeManagment.Services
             if (user==null)
                 throw new Exception("User not found");
 
+            var caseEntity = await _casesRepo.GetByIdAsync
+                (request.CaseId);
+            if (caseEntity == null)
+                throw new Exception("Case not found");
+
+            if (caseEntity.Status == Status.Closed)
+                throw new InvalidOperationException("Cannot add evidence. The case is closed.");
+
             var evidence = new Evidence
             {
                 CaseId = request.CaseId,
@@ -86,6 +97,14 @@ namespace CrimeManagment.Services
             var user = await _userRepo.GetByIdAsync(request.CreatedByUserId);
             if (user == null)
                 throw new Exception("User not found");
+
+            var caseEntity = await _casesRepo.GetByIdAsync(request.CaseId);
+            if (caseEntity == null)
+                throw new Exception("Case not found");
+
+            if (caseEntity.Status == Status.Closed)
+                throw new InvalidOperationException("Cannot add evidence. The case is closed.");
+
             if (request.File == null)
                 throw new ArgumentException("Image file is required.");
 
@@ -121,7 +140,6 @@ namespace CrimeManagment.Services
             await _evidenceRepo.AddAsync(evidence);
             return evidence;
         }
-
     }
 }
 
