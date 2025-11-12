@@ -36,18 +36,17 @@ namespace CrimeManagment.Services
             await _repo.AddAsync(entity);
 
             var allUsers = await _userRepo.GetAllUsersAsync();
-            foreach (var user in allUsers)
-            {
-                if (!string.IsNullOrWhiteSpace(user.Email))
+            
+                if (!string.IsNullOrWhiteSpace(entity.Email))
                 {
                     string subject = $"New Crime Reported in {entity.AreaCity}";
                     string body = $"A new crime has been reported in {entity.AreaCity}.<br>" +
                                   $"<strong>Title:</strong> {entity.Title}<br>" +
                                   $"<strong>Description:</strong> {entity.Description}<br>" +
                                   $"<strong>Date:</strong> {entity.ReportDataTime}";
-                    await _emailService.SendEmailAsync(user.Email, subject, body);
+                    await _emailService.SendEmailAsync(entity.Email, subject, body);
                 }
-            }
+            
 
             return new CrimeReportDto
             {
