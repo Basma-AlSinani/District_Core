@@ -49,7 +49,7 @@ namespace CrimeManagementApi.Controllers
 
 
         [HttpPost("user/submit-report")]
-        [Authorize(Roles = "Admin")]
+        [Authorize] // يسمح لجميع المستخدمين المسجلين
         public async Task<IActionResult> CreateReportByUser([FromBody] CreateCrimeReportByUserDto dto)
         {
             if (!ModelState.IsValid)
@@ -58,10 +58,12 @@ namespace CrimeManagementApi.Controllers
             try
             {
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(userIdClaim))
-                    return Unauthorized(new { Message = "You are not authorized to submit a report." });
+                if (!int.TryParse(userIdClaim, out int userId))
+                    return Unauthorized(new { Message = "Invalid user context." });
 
-                dto.ReportedByUserId = int.Parse(userIdClaim);
+                dto.ReportedByUserId = userId;
+
+                
                 var reportDto = await _crimeReportsService.CreateReportAsync(
                     new CreateCrimeReportDto
                     {
@@ -69,14 +71,16 @@ namespace CrimeManagementApi.Controllers
                         Description = dto.Description,
                         AreaCity = dto.AreaCity,
                         Latitude = dto.Latitude,
-                        Longitude = dto.Longitude
+                        Longitude = dto.Longitude,
+        
                     },
                     dto.ReportedByUserId
                 );
+
                 return Ok(new
                 {
                     ReportId = reportDto.Id,
-                    Message = "Report submitted successfully."
+                    Message = "Report submitted successfully. An email notification has been sent."
                 });
             }
             catch (Exception ex)
@@ -85,6 +89,7 @@ namespace CrimeManagementApi.Controllers
                 return StatusCode(500, new { message = "Error creating report with user context." });
             }
         }
+
 
         [HttpGet("Get/All/Crime/Report")]
         [Authorize(Roles = "Admin")]

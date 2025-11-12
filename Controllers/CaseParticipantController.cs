@@ -26,23 +26,6 @@ namespace Crime.Controllers
             _mapper = mapper;
         }
 
-        [HttpPost("AddParticipant")]
-        public async Task<IActionResult> AddParticipant([FromBody] CreateParticipantDto dto)
-        {
-            if (dto == null)
-                return BadRequest("Participant data is required");
-
-            var result = await _participantService.CreateAsync(dto);
-
-            if (result == null)
-                return BadRequest("Failed to create participant");
-
-            return Ok(result);
-        }
-
-
-
-
         [HttpGet("GetAllCaseParticipants")]
         public async Task<IActionResult> GetAllCaseParticipants()
         {

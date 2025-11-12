@@ -22,5 +22,9 @@ namespace CrimeManagment.Repositories
             return await _context.Users
                 .FirstOrDefaultAsync(u => u.Email == email);
         }
+        public async Task<IEnumerable<Users>> GetAllUsersAsync()  
+        {
+            return await _context.Users.ToListAsync();
+        }
     }
 }
