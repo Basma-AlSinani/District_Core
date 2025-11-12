@@ -33,14 +33,13 @@ namespace CrimeManagment.Mapping
             CreateMap<UpdateCaseParticipantDto, CaseParticipants>()
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<CaseAssigneesDTOs.AssignUserDTO, CaseAssignees>()
-    .ForMember(dest => dest.AssignedToUserId, opt => opt.MapFrom(src => src.AssigneeId))
-    .ForMember(dest => dest.Status, opt => opt.MapFrom(src => ProgreessStatus.Pending))
-    .ForMember(dest => dest.AssignedAt, opt => opt.MapFrom(src => DateTime.UtcNow));
+                .ForMember(dest => dest.AssignedToUserId, opt => opt.MapFrom(src => src.AssigneeId))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => ProgreessStatus.Pending))
+                .ForMember(dest => dest.AssignedAt, opt => opt.MapFrom(src => DateTime.UtcNow));
 
-
-
-
-
+            // Participants mapping
+            CreateMap<Participants, ParticipantDto>().ReverseMap();
+            CreateMap<CreateParticipantDto, Participants>();
         }
     }
 }

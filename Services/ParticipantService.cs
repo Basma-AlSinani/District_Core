@@ -10,12 +10,14 @@ namespace CrimeManagment.Services
     public class ParticipantService : IParticipantService
     {
         private readonly IParticipantsRepo _participantRepository;
+        private readonly ICaseParticipantsRepo _caseParticipantRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<ParticipantService> _logger;
 
-        public ParticipantService(IParticipantsRepo participantRepository, IMapper mapper, ILogger<ParticipantService> logger)
+        public ParticipantService(IParticipantsRepo participantRepository, ICaseParticipantsRepo caseParticipantRepository, IMapper mapper, ILogger<ParticipantService> logger)
         {
             _participantRepository = participantRepository;
+            _caseParticipantRepository = caseParticipantRepository;
             _mapper = mapper;
             _logger = logger;
         }
@@ -41,15 +43,25 @@ namespace CrimeManagment.Services
             {
                 var entity = _mapper.Map<Participants>(dto);
 
-                var now = DateTime.UtcNow;
-                var participantDto = _mapper.Map<ParticipantDto>(entity);
-                participantDto.AddedOn = now;
-                participantDto.AddedByUserId = dto.AddedByUserId;
-
                 await _participantRepository.AddAsync(entity);
                 await _participantRepository.SaveChangesAsync();
 
-                _logger.LogInformation("Participant {Name} added successfully.", entity.FullName);
+                var caseParticipant = new CaseParticipants
+                {
+                    CaseId = dto.CaseId,
+                    ParticipantId = entity.ParticipantsId,
+                    AddedByUserId = dto.AddedByUserId,
+                    Notes = dto.Notes,
+                    Role = Role.Witness, 
+                    AssignedAt = DateTime.Now
+                };
+
+                await _caseParticipantRepository.AddAsync(caseParticipant);
+                await _caseParticipantRepository.SaveChangesAsync();
+
+                var participantDto = _mapper.Map<ParticipantDto>(entity);
+                participantDto.AddedOn = DateTime.UtcNow;
+                participantDto.AddedByUserId = dto.AddedByUserId;
 
                 return participantDto;
             }
@@ -59,8 +71,6 @@ namespace CrimeManagment.Services
                 return null;
             }
         }
-
-
 
         // Update an existing participant
         public async Task<bool> UpdateAsync(int id, ParticipantDto dto)

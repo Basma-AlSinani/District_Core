@@ -17,5 +17,8 @@ namespace CrimeManagment.Models
 
         [MaxLength(500)]
         public string Notes { get; set; }
+
+        [Required]
+        public int CaseId { get; set; }
     }
 }

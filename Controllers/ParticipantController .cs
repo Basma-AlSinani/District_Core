@@ -8,10 +8,10 @@ using CrimeManagment.Services;
 [Route("api/[controller]")]
 public class ParticipantController : ControllerBase
 {
-    private readonly ParticipantService _participantService;
+    private readonly IParticipantService _participantService;
     private readonly ILogger<ParticipantController> _logger;
 
-    public ParticipantController(ParticipantService participantService, ILogger<ParticipantController> logger)
+    public ParticipantController(IParticipantService participantService, ILogger<ParticipantController> logger)
     {
         _participantService = participantService;
         _logger = logger;
@@ -46,7 +46,7 @@ public class ParticipantController : ControllerBase
 
  
     [Authorize]
-    [HttpGet("Get/By/Id{id}")]
+    [HttpGet("Get/By/Id/{id}")]
     public async Task<IActionResult> GetById(int id)
     {
         var participant = await _participantService.GetByIdAsync(id);
