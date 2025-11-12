@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CrimeManagment.Migrations
 {
     [DbContext(typeof(CrimeDbContext))]
-    [Migration("20251111123115_AddEmailToCrimeReports")]
-    partial class AddEmailToCrimeReports
+    [Migration("20251112071459_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

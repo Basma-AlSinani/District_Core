@@ -79,7 +79,7 @@ builder.Services.AddScoped<IEvidenceService, EvidenceService>();
 builder.Services.AddScoped<ICasesRepo, CasesRepo>();
 builder.Services.AddScoped<ICaseService, CaseService>();
 builder.Services.AddScoped<IParticipantsRepo, ParticipantsRepo>();
-builder.Services.AddScoped<IParticipantService, ParticipantService>();
+builder.Services.AddScoped<IParticipantService, ParticipantService> ();
 builder.Services.AddScoped<IUsersRepo, UsersRepo>();
 builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<ICaseParticipantsRepo, CaseParticipantsRepo>();

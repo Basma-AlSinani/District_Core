@@ -27,6 +27,7 @@ namespace CrimeManagment.Mapping
             CreateMap<Users, UserDTO>();
 
             // Mapping for CaseParticipants
+            CreateMap<Participants, ParticipantDto>().ReverseMap();
             CreateMap<CaseParticipants, CaseParticipantDto>();
             CreateMap<CreateCaseParticipantDto, CaseParticipants>();
             CreateMap<UpdateCaseParticipantDto, CaseParticipants>()

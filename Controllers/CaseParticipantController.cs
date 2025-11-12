@@ -1,5 +1,8 @@
-﻿using CrimeManagment.DTOs;
+﻿using AutoMapper;
+using CrimeManagment.DTOs;
+using CrimeManagment.Models;
 using CrimeManagment.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -7,61 +10,70 @@ namespace Crime.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class CaseParticipantController : ControllerBase
     {
-        private readonly ICaseParticipantService _service;
+        private readonly ICaseParticipantService _caseParticipantService;
+        private readonly IParticipantService _participantService;
+        private readonly IMapper _mapper;
 
-        public CaseParticipantController(ICaseParticipantService service)
+        public CaseParticipantController(
+            ICaseParticipantService caseParticipantService,
+            IParticipantService participantService, IMapper mapper)
         {
-            _service = service;
+            _caseParticipantService = caseParticipantService;
+            _participantService = participantService;
+            _mapper = mapper;
         }
 
-        // Add participant to case
-        [HttpPost("AddParticipantToCase")]
-        public async Task<IActionResult> Add([FromBody] CreateCaseParticipantDto dto)
+        [HttpPost("AddParticipant")]
+        public async Task<IActionResult> AddParticipant([FromBody] CreateParticipantDto dto)
         {
-            var result = await _service.AddAsync(dto);
+            if (dto == null)
+                return BadRequest("Participant data is required");
+
+            var result = await _participantService.CreateAsync(dto);
+
             if (result == null)
-                return BadRequest(new { message = "Participant already linked or invalid Case/Participant ID" });
+                return BadRequest("Failed to create participant");
 
             return Ok(result);
         }
 
-        // Get all case participants
+
+
+
         [HttpGet("GetAllCaseParticipants")]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAllCaseParticipants()
         {
-            var data = await _service.GetAllAsync();
+            var data = await _caseParticipantService.GetAllAsync();
             return Ok(data);
         }
 
-        // Get case participant by id
         [HttpGet("GetCaseParticipantById/{id}")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetCaseParticipantById(int id)
         {
-            var result = await _service.GetByIdAsync(id);
+            var result = await _caseParticipantService.GetByIdAsync(id);
             if (result == null)
                 return NotFound(new { message = "Case participant not found" });
 
             return Ok(result);
         }
 
-        // Update case participant
         [HttpPut("UpdateCaseParticipantById/{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] UpdateCaseParticipantDto dto)
+        public async Task<IActionResult> UpdateCaseParticipantById(int id, [FromBody] UpdateCaseParticipantDto dto)
         {
-            var success = await _service.UpdateAsync(id, dto);
+            var success = await _caseParticipantService.UpdateAsync(id, dto);
             if (!success)
                 return NotFound(new { message = "Case participant not found" });
 
             return Ok(new { message = "Updated successfully" });
         }
 
-        // Delete case participant
         [HttpDelete("DeleteCaseParticipantById/{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> DeleteCaseParticipantById(int id)
         {
-            var success = await _service.DeleteAsync(id);
+            var success = await _caseParticipantService.DeleteAsync(id);
             if (!success)
                 return NotFound(new { message = "Case participant not found" });
 
@@ -69,4 +81,3 @@ namespace Crime.Controllers
         }
     }
 }
-
