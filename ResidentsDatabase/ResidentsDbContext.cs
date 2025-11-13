@@ -9,5 +9,7 @@ namespace ResidentsDatabase
     {
         public DbSet<Resident> Residents { get; set; }   
         public ResidentsDbContext(DbContextOptions<ResidentsDbContext> options) : base(options) { }
+       
+
     }
 }

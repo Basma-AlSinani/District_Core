@@ -49,7 +49,7 @@ namespace CrimeManagementApi.Controllers
 
 
         [HttpPost("user/submit-report")]
-        [Authorize] // يسمح لجميع المستخدمين المسجلين
+        [Authorize] 
         public async Task<IActionResult> CreateReportByUser([FromBody] CreateCrimeReportByUserDto dto)
         {
             if (!ModelState.IsValid)

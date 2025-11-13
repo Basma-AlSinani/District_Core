@@ -1,4 +1,8 @@
 
+using Microsoft.EntityFrameworkCore;
+using ResidentsDatabase.Repositories;
+using ResidentsDatabase.Services;
+
 namespace ResidentsDatabase
 {
     public class Program
@@ -7,17 +11,22 @@ namespace ResidentsDatabase
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-
+            // Add services
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            var app = builder.Build();
-            
+            // Register DbContext
+            builder.Services.AddDbContext<ResidentsDbContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            // Configure the HTTP request pipeline.
+            // Register Repos & Services
+            builder.Services.AddScoped<IResidentRepo, ResidentRepo>();
+            builder.Services.AddScoped<IResidentService, ResidentService>();
+
+            var app = builder.Build();
+
+            // Middleware
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -25,14 +34,9 @@ namespace ResidentsDatabase
             }
 
             app.UseHttpsRedirection();
-
             app.UseAuthorization();
-
-
             app.MapControllers();
-
             app.Run();
         }
     }
 }
-//testing
