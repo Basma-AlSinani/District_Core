@@ -1,5 +1,6 @@
 ﻿using CrimeManagment.Services;
 using Microsoft.AspNetCore.Mvc;
+using ResidentsDatabase.Services;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static CrimeManagment.DTOs.EmailDTOs;
@@ -11,9 +12,11 @@ namespace CrimeManagment.Controllers
     public class EmailController : ControllerBase
     {
         private readonly IEmailService _emailService;
-        public EmailController(IEmailService emailService)
+        private readonly ResidentsApiClient _residentsApiClient;
+        public EmailController(IEmailService emailService, ResidentsApiClient residentsApiClient)
         {
             _emailService = emailService;
+            _residentsApiClient = residentsApiClient;
         }
         private bool IsValidEmail(string email)
         {
@@ -72,6 +75,22 @@ namespace CrimeManagment.Controllers
             {
                 return BadRequest(new { Message = $"Failed to send new crime alert email: {ex.Message}" });
             }
+        }
+
+        
+        [HttpPost("SendResidentsEmails")]
+        public async Task<IActionResult> SendResidentsEmails()
+        {
+            var residents = await _residentsApiClient.GetAllResidentsAsync();
+            foreach (var resident in residents)
+            {
+                await _emailService.SendEmailAsync(
+                    resident.Email,
+                    "Verification Notice",
+                    $"Dear {resident.FullName}, please verify your registration."
+                );
+            }
+            return Ok(new { Message = $"Emails sent to {residents.Count()} residents." });
         }
     }
 }

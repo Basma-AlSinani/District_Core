@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json.Serialization;
+using ResidentsDatabase.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -97,7 +98,10 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.Configure<EmailSettings>(
     builder.Configuration.GetSection("EmailSettings")
 );
-builder.Services.AddAutoMapper(typeof(Mapping));
+builder.Services.AddHttpClient<ResidentsApiClient>(client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7200/"); 
+}); builder.Services.AddAutoMapper(typeof(Mapping));
 
 // ======================
 //  JWT Authentication
