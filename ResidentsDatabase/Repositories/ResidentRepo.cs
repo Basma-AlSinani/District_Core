@@ -3,20 +3,20 @@ using ResidentsDatabase.Models;
 
 namespace ResidentsDatabase.Repositories
 {
-    public class ResidentRepo
+    public class ResidentRepo : IResidentRepo
     {
-        private readonly CrimeDbContext _context;
-        public ResidentRepo(CrimeDbContext context)
+        private readonly ResidentsDbContext _context;
+        public ResidentRepo(ResidentsDbContext context)
         {
             _context = context;
         }
 
         public async Task<IEnumerable<Resident>> GetAllResidentsAsync()
         {
-            return await _context.Resident.ToListAsync();
+            return await _context.Residents.ToListAsync();
         }
 
-        public async Task<Resident?> GetByrESidentIdAsync(string residentId)
+        public async Task<Resident?> GetByResidentIdAsync(string residentId)
         {
             return await _context.Residents
                 .FirstOrDefaultAsync(r => r.NationalId == residentId);
