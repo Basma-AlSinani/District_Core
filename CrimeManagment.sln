@@ -10,6 +10,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Helpers", "Helpers", "{02EA
 		EnumSchemaFilter.cs = EnumSchemaFilter.cs
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResidentsDatabase", "ResidentsDatabase\ResidentsDatabase.csproj", "{3FD2A7E8-6E2B-DAD2-7C9A-5CE46E16C3BF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,6 +22,10 @@ Global
 		{1DD57887-54B0-462A-B197-9FE6BAD12763}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1DD57887-54B0-462A-B197-9FE6BAD12763}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1DD57887-54B0-462A-B197-9FE6BAD12763}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3FD2A7E8-6E2B-DAD2-7C9A-5CE46E16C3BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FD2A7E8-6E2B-DAD2-7C9A-5CE46E16C3BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FD2A7E8-6E2B-DAD2-7C9A-5CE46E16C3BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FD2A7E8-6E2B-DAD2-7C9A-5CE46E16C3BF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
