@@ -1,22 +1,19 @@
-﻿using System.Net.Http;
-using CrimeManagment.DTOs;
-namespace ResidentsDatabase.Services
+﻿using CrimeManagment.DTOs;
+
+public class ResidentsApiClient
 {
-    public class ResidentsApiClient
+    private readonly HttpClient _httpClient;
+
+    public ResidentsApiClient(HttpClient httpClient)
     {
-        private readonly HttpClient _httpClient;
+        _httpClient = httpClient;
+        _httpClient.BaseAddress = new Uri("https://localhost:7165/"); 
+    }
 
-        public ResidentsApiClient(HttpClient httpClient)
-        {
-            _httpClient = httpClient;
-        }
-
-        public async Task<IEnumerable<ResidentDto>> GetAllResidentsAsync()
-        {
-            var response = await _httpClient.GetAsync("api/Resident/list");
-            response.EnsureSuccessStatusCode();
-            var residents = await response.Content.ReadFromJsonAsync<IEnumerable<ResidentDto>>();
-            return residents ?? Enumerable.Empty<ResidentDto>();
-        }
+    public async Task<IEnumerable<ResidentDto>> GetAllResidentsAsync()
+    {
+        var response = await _httpClient.GetAsync("api/Resident/list");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<IEnumerable<ResidentDto>>();
     }
 }

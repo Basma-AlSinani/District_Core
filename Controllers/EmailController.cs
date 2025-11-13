@@ -1,8 +1,6 @@
 ﻿using CrimeManagment.Services;
 using Microsoft.AspNetCore.Mvc;
-using ResidentsDatabase.Services;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using static CrimeManagment.DTOs.EmailDTOs;
 
 namespace CrimeManagment.Controllers

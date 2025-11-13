@@ -10,7 +10,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json.Serialization;
-using ResidentsDatabase.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

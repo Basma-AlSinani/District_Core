@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ResidentsDatabase.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace ResidentsDatabase.DTOs
 {
@@ -25,6 +26,36 @@ namespace ResidentsDatabase.DTOs
 
         [Required(ErrorMessage = "Email is required")]
         [EmailAddress(ErrorMessage = "Invalid email format")]
+        public string Email { get; set; } = string.Empty;
+    }
+    public class AddResidentDTO
+    {
+        [Required, StringLength(8, MinimumLength = 8)]
+        public string NationalId { get; set; } = string.Empty;
+
+        [Required, MaxLength(50)]
+        public string FirstName { get; set; } = string.Empty;
+
+        [MaxLength(50)]
+        public string MiddleName { get; set; } = string.Empty;
+
+        [MaxLength(50)]
+        public string ThirdName { get; set; } = string.Empty;
+
+        [Required, MaxLength(50)]
+        public string LastName { get; set; } = string.Empty;
+
+        [Required]
+        public DateTime DateOfBirth { get; set; }
+
+        [Required]
+        public OmanGovernorate City { get; set; }
+
+        [Required, MaxLength(15)]
+        [Phone]
+        public string PhoneNumber { get; set; } = string.Empty;
+
+        [Required, EmailAddress]
         public string Email { get; set; } = string.Empty;
     }
 }
