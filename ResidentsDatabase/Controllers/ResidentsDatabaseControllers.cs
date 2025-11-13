@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ResidentsDatabase.DTOs;
 using ResidentsDatabase.Services;
 
 namespace ResidentsDatabase.Controllers
@@ -15,11 +16,23 @@ namespace ResidentsDatabase.Controllers
             _residentService = residentService;
         }
 
-        [HttpGet("GetAllResidents")]
-        public async Task<IActionResult> GetAllResidents()
+
+        [HttpGet("list")]
+        public async Task<IActionResult> GetResidentsList()
         {
             var residents = await _residentService.GetAllResidentsAsync();
-            return Ok(residents);
+
+            var result = residents.Select(r => new ListResidentDTO
+            {
+                NationalId = r.NationalId,
+                FullName = $"{r.FirstName} {r.MiddleName} {r.LastName}",
+                DateOfBirth = r.DateOfBirth,
+                City = r.City.ToString(),
+                PhoneNumber = r.PhoneNumber,
+                Email = r.Email
+            });
+
+            return Ok(result);
         }
     }
 }
